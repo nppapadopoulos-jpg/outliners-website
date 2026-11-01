@@ -17,6 +17,17 @@ jobs:
       - name: Run smoke tests
         run: python3 tests/smoke_test.py
 
+  backend-tests:
+    name: Forms backend tests (mocked storage/email)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run backend test suite
+        run: node --test api/tests/*.test.mjs
+
   ui-regression:
     name: UI regression (axe accessibility, nav wrap, overflow)
     runs-on: ubuntu-latest
