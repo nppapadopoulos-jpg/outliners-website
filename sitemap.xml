@@ -1,13 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://outliners.gr/</loc></url>
-  <url><loc>https://outliners.gr/services/</loc></url>
-  <url><loc>https://outliners.gr/services/recruitment-executive-search/</loc></url>
-  <url><loc>https://outliners.gr/services/embedded-talent-partner/</loc></url>
-  <url><loc>https://outliners.gr/services/talent-advisory/</loc></url>
-  <url><loc>https://outliners.gr/industries/</loc></url>
-  <url><loc>https://outliners.gr/about/</loc></url>
-  <url><loc>https://outliners.gr/contact/</loc></url>
-  <url><loc>https://outliners.gr/privacy-policy/</loc></url>
-  <url><loc>https://outliners.gr/cookies/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://outliners.gr/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/services/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/services/recruitment-executive-search/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/recruitment-executive-search/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/recruitment-executive-search/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/recruitment-executive-search/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/services/recruitment-executive-search/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/recruitment-executive-search/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/recruitment-executive-search/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/recruitment-executive-search/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/services/embedded-talent-partner/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/embedded-talent-partner/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/embedded-talent-partner/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/embedded-talent-partner/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/services/embedded-talent-partner/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/embedded-talent-partner/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/embedded-talent-partner/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/embedded-talent-partner/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/services/talent-advisory/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/talent-advisory/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/talent-advisory/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/talent-advisory/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/services/talent-advisory/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/services/talent-advisory/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/services/talent-advisory/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/services/talent-advisory/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/industries/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/industries/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/industries/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/industries/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/industries/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/industries/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/industries/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/industries/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/about/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/about/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/about/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/about/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/about/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/contact/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/contact/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/contact/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/contact/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/contact/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/contact/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/privacy-policy/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/privacy-policy/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/privacy-policy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/privacy-policy/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/privacy-policy/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/privacy-policy/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/privacy-policy/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/privacy-policy/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/cookies/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/cookies/"/>
+  </url>
+  <url>
+    <loc>https://outliners.gr/el/cookies/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://outliners.gr/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="el" href="https://outliners.gr/el/cookies/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://outliners.gr/cookies/"/>
+  </url>
 </urlset>

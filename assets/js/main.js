@@ -1,50 +1,6 @@
-/* OutLiners — site behaviour (no dependencies, no trackers) */
+/* OutLiners — site behaviour (no dependencies, no trackers, nothing stored) */
 (function () {
   "use strict";
-
-  var html = document.documentElement;
-  var KEY = "outliners-lang";
-
-  /* ---------- Language toggle (EN default, EL stored locally) ---------- */
-  function currentLang() {
-    return html.classList.contains("el") ? "el" : "en";
-  }
-
-  function applyLang(lang) {
-    var greek = lang === "el";
-    html.classList.toggle("el", greek);
-    html.setAttribute("lang", greek ? "el" : "en");
-
-    // Swap the document title if the page declares both variants.
-    var body = document.body;
-    if (body) {
-      var t = greek ? body.getAttribute("data-title-el") : body.getAttribute("data-title-en");
-      if (t) document.title = t;
-    }
-
-    document.querySelectorAll(".lang-toggle").forEach(function (btn) {
-      btn.textContent = greek ? "EN" : "ΕΛ";
-      btn.setAttribute(
-        "aria-label",
-        greek ? "Switch to English" : "Αλλαγή γλώσσας στα Ελληνικά"
-      );
-    });
-
-    try {
-      localStorage.setItem(KEY, greek ? "el" : "en");
-    } catch (e) {
-      /* storage unavailable — preference simply won't persist */
-    }
-  }
-
-  document.addEventListener("click", function (e) {
-    var btn = e.target.closest(".lang-toggle");
-    if (!btn) return;
-    applyLang(currentLang() === "el" ? "en" : "el");
-  });
-
-  // The head snippet may have set html.el before paint; sync UI labels now.
-  applyLang(currentLang());
 
   /* ---------- Mobile navigation ---------- */
   var toggle = document.querySelector(".menu-toggle");

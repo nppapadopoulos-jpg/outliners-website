@@ -86,10 +86,6 @@ p:last-child { margin-bottom: 0; }
 
 ::selection { background: var(--ink); color: var(--paper); }
 
-/* ---- Language toggle: html.el shows Greek, hides English ---- */
-html.el [data-en],
-html:not(.el) [data-el] { display: none !important; }
-
 /* ---- Layout ---- */
 .wrap { max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
 
