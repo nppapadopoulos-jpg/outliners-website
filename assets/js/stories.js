@@ -8,7 +8,7 @@
   const count = hero.querySelector('.story-count');
   const play = hero.querySelector('.story-play');
   const greek = document.documentElement.lang === 'el';
-  const paths = ['determination.webp','vision.webp','responsibility.webp','innovation.webp'];
+  const paths = ['innovation.webp','vision.webp','responsibility.webp','determination.webp'];
   const loaded = new Map();
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let current = 0, timer = null, playing = !reduceMotion.matches, requestId = 0;
@@ -72,7 +72,7 @@
   document.addEventListener('visibilitychange', schedule);
   reduceMotion.addEventListener('change', () => { if (reduceMotion.matches) { playing = false; setPlayUI(); schedule(); } });
   setPlayUI();
-  // Only replace the fallback after the first standalone photograph is available.
+  // First story is the AI developer. Use the approved meeting-room fallback until images are uploaded.
   select(0, false);
   schedule();
   paths.forEach((_, index) => { if (index) preload(index); });
