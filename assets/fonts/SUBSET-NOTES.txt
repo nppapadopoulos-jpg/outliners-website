@@ -1,0 +1,7 @@
+InterVariable.woff2 is a Latin+Greek subset of Inter Variable (rsms/inter
+v4.1), produced with pyftsubset keeping all OpenType features, both axes
+(opsz, wght) and the full OFL name/license metadata. Inter declares no
+Reserved Font Name, so subsetting requires no rename under the OFL 1.1.
+Original: 344 KB -> subset: 225 KB. Unicode ranges: U+0000-024F,
+U+0300-03FF, U+1E00-1FFF, U+2000-206F, U+20A0-20CF, U+2160-216F,
+U+2190-2199, U+2212, U+2022.

@@ -16,3 +16,20 @@ jobs:
           python-version: "3.12"
       - name: Run smoke tests
         run: python3 tests/smoke_test.py
+
+  ui-regression:
+    name: UI regression (axe accessibility, nav wrap, overflow)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install test dependencies
+        run: npm install --no-save playwright@1.49.1 axe-core@4.10.2
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve site
+        run: python3 -m http.server 8900 &
+      - name: Run UI checks
+        run: node tests/ui_checks.mjs
