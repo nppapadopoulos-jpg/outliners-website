@@ -619,13 +619,69 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
   .hero__visual img { object-position: center; }
 }
 
-/* Selected partnerships: typographic placeholders until official logo assets are supplied. */
-.clients-section { padding-block: clamp(40px, 5vw, 68px); background: var(--paper); border-bottom: 1px solid var(--line); }
-.clients-section .kicker { margin-bottom: 28px; }
-.client-grid { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px 30px; margin: 0; padding: 0; align-items: center; }
-.client-name { font-size: clamp(.95rem, 1.45vw, 1.22rem); font-weight: 650; letter-spacing: -.035em; color: #565550; text-align: center; white-space: nowrap; }
-@media (max-width: 900px) { .client-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 20px; } }
-@media (max-width: 540px) { .client-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; } .client-name { font-size: 1rem; } }
+/* ==========================================================================
+   Selected Clients & Partnerships — curated dark showcase.
+   Each cell renders either an authentic logo image (preferred; white
+   treatment via filter, optically sized by height) or a refined typographic
+   wordmark fallback. Swapping a fallback for a verified asset requires no
+   layout change: <span class="client-mark">Name</span> becomes
+   <img src="/assets/img/clients/name.svg" alt="Name" width="…" height="…">.
+   ========================================================================== */
+.clients-section {
+  background: var(--black);
+  color: var(--white);
+  border-top: 1px solid var(--line-dark);
+  padding-block: clamp(56px, 7vw, 92px);
+}
+.clients-section .kicker {
+  color: var(--grey-soft);
+  margin-bottom: clamp(32px, 4.5vw, 48px);
+}
+.client-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  row-gap: clamp(28px, 4vw, 42px);
+}
+.client {
+  flex: 0 0 25%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 18px;
+}
+.client-mark {
+  font-size: clamp(1.02rem, 1.4vw, 1.28rem);
+  font-weight: 560;
+  letter-spacing: -.018em;
+  color: #908f8a;
+  white-space: nowrap;
+  transition: color .25s var(--ease);
+}
+.client img {
+  height: 30px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: .72;
+  transition: opacity .25s var(--ease);
+}
+.client:hover .client-mark, .client:focus-within .client-mark { color: var(--white); }
+.client:hover img, .client:focus-within img { opacity: 1; }
+@media (max-width: 900px) {
+  .client { flex-basis: 33.333%; padding: 4px 12px; }
+}
+@media (max-width: 560px) {
+  .client { flex-basis: 50%; padding: 4px 8px; }
+  .client-mark { font-size: .98rem; }
+  .client img { height: 24px; max-width: 120px; }
+}
 
 /* Four human stories — editorial, responsive, accessible. */
 .hero--stories { position: relative; overflow: hidden; padding: 0; min-height: min(780px, 90svh); background: #09090a; }
