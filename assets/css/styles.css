@@ -626,3 +626,44 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
 .client-name { font-size: clamp(.95rem, 1.45vw, 1.22rem); font-weight: 650; letter-spacing: -.035em; color: #565550; text-align: center; white-space: nowrap; }
 @media (max-width: 900px) { .client-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 20px; } }
 @media (max-width: 540px) { .client-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; } .client-name { font-size: 1rem; } }
+
+/* Four human stories — editorial, responsive, accessible. */
+.hero--stories { position: relative; overflow: hidden; padding: 0; min-height: min(780px, 90svh); background: #09090a; }
+.stories-layout { position: relative; min-height: min(780px, 90svh); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; }
+.stories-copy { position: relative; z-index: 2; padding-block: clamp(75px, 9vw, 145px); padding-right: clamp(12px, 3vw, 40px); }
+.stories-copy .display-1 { font-size: clamp(3rem, 5.5vw, 6rem); max-width: 12ch; }
+.stories-copy .lead { color: #b1b1b1; max-width: 38ch; }
+.stories-copy .kicker { color: #b5b5b5; }
+.stories-stage { position: absolute; inset: 0 max(calc((var(--wrap) - 100vw) / 2), calc(-1 * var(--gutter))) 0 39%; overflow: hidden; background: #181818; }
+.story-image { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: grayscale(1); }
+.stories-stage__shade { position: absolute; inset: 0; background: linear-gradient(90deg,#09090a 0%,rgba(9,9,10,.86) 8%,rgba(9,9,10,.12) 43%,rgba(9,9,10,.38) 100%); pointer-events: none; }
+.story-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; margin-top: 28px; color: #e8e8e8; font-size: .83rem; }
+.story-play { width: 40px; height: 40px; border: 1px solid #dedede; border-radius: 50%; display: grid; place-items: center; }
+.story-play:hover, .story-play:focus-visible { background: #fff; color: #111; }
+.story-count { letter-spacing: .16em; color: #aaa; }
+.stories-tabs { position: absolute; z-index: 1; right: clamp(20px, 4vw, 64px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 14px; }
+.story-tab { display: flex; align-items: center; gap: 12px; color: #aaa; text-align: left; font-size: .88rem; padding: 8px 0; border: 0; transition: color .2s ease; }
+.story-tab::before { content: ''; width: 23px; height: 1px; background: #777; }
+.story-tab.is-active, .story-tab:hover, .story-tab:focus-visible { color: #fff; }
+.story-tab.is-active::before { background: #fff; height: 2px; }
+.story-tab__number { font-variant-numeric: tabular-nums; }
+@media (max-width: 900px) {
+ .hero--stories, .stories-layout { min-height: 0; }
+ .stories-layout { display: block; padding-block: 0; }
+ .stories-copy { padding: 72px 0 38px; }
+ .stories-copy .display-1 { font-size: clamp(2.8rem, 8vw, 5rem); }
+ .stories-stage { position: relative; inset: auto; width: calc(100% + 2 * var(--gutter)); margin-inline: calc(-1 * var(--gutter)); height: clamp(360px, 65vw, 600px); }
+ .stories-stage__shade { background: linear-gradient(0deg,rgba(9,9,10,.65),transparent 55%); }
+ .stories-tabs { top: auto; right: 20px; bottom: 18px; transform: none; flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
+ .story-tab { font-size: .77rem; }
+ .story-tab::before { width: 12px; }
+}
+@media (max-width: 560px) {
+ .stories-copy { padding-top: 56px; }
+ .stories-stage { height: 370px; }
+ .stories-tabs { left: 16px; right: 16px; justify-content: center; }
+ .story-tab { gap: 5px; }
+ .story-tab::before { display: none; }
+ .story-controls { gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .story-tab { transition: none; } }
