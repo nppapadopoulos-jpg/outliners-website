@@ -45,20 +45,32 @@
   </nav>
 </header>
 <main id="main">
-<section class="hero hero--photo">
-  <div class="wrap hero__layout">
-    <div class="hero__copy">
-    <span class="kicker">Boutique recruitment &amp; talent advisory</span>
-    <h1 class="display-1">People make<br>the difference.</h1>
-    <p class="lead">We help ambitious companies in Greece and internationally find the right people, build stronger hiring capability and make better talent decisions — with senior attention on every engagement.</p>
-    <div class="actions">
-      <a class="btn" href="/contact/">Discuss your hiring needs <span class="arrow" aria-hidden="true">→</span></a>
-      <a class="btn btn--outline" href="/services/">Explore our services</a>
+<section class="hero hero--stories" aria-label="Four stories of human achievement">
+  <div class="wrap stories-layout">
+    <div class="stories-copy">
+      <span class="kicker">Boutique recruitment &amp; talent advisory</span>
+      <h1 class="display-1">People make<br>the difference.</h1>
+      <p class="lead">We find the people who move the world forward.</p>
+      <div class="story-controls">
+        <button class="story-play" type="button" aria-label="Pause story rotation" aria-pressed="true"><span aria-hidden="true">Ⅱ</span></button>
+        <span>Four stories. One belief.</span>
+        <span class="story-count" aria-live="off">01 / 04</span>
+      </div>
+      <div class="actions">
+        <a class="btn" href="/contact/">Discuss your hiring needs <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn--outline" href="/services/">Explore our services</a>
+      </div>
     </div>
+    <div class="stories-stage" id="story-panel" role="tabpanel" aria-labelledby="story-tab-0">
+      <img class="story-image is-active" src="/assets/img/meeting-room-hero.webp" alt="" width="1671" height="941" fetchpriority="high" decoding="async">
+      <div class="stories-stage__shade" aria-hidden="true"></div>
+      <div class="stories-tabs" role="tablist" aria-label="Choose a story">
+        <button class="story-tab is-active" type="button" role="tab" id="story-tab-0" aria-controls="story-panel" aria-selected="true" data-story="0"><span class="story-tab__number">01</span><span>Determination</span></button>
+<button class="story-tab" type="button" role="tab" id="story-tab-1" aria-controls="story-panel" aria-selected="false" data-story="1"><span class="story-tab__number">02</span><span>Vision</span></button>
+<button class="story-tab" type="button" role="tab" id="story-tab-2" aria-controls="story-panel" aria-selected="false" data-story="2"><span class="story-tab__number">03</span><span>Responsibility</span></button>
+<button class="story-tab" type="button" role="tab" id="story-tab-3" aria-controls="story-panel" aria-selected="false" data-story="3"><span class="story-tab__number">04</span><span>Innovation</span></button>
+      </div>
     </div>
-    <figure class="hero__visual">
-      <img src="/assets/img/meeting-room-hero.webp" alt="" width="1671" height="941" fetchpriority="high" decoding="async">
-    </figure>
   </div>
 </section>
 
