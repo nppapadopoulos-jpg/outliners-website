@@ -642,29 +642,58 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
 .story-play:hover, .story-play:focus-visible { background: #fff; color: #111; }
 .story-count { letter-spacing: .16em; color: #aaa; }
 .stories-tabs { position: absolute; z-index: 1; right: clamp(20px, 4vw, 64px); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 14px; }
-.story-tab { display: flex; align-items: center; gap: 12px; color: #aaa; text-align: left; font-size: .88rem; padding: 8px 0; border: 0; transition: color .2s ease; }
-.story-tab::before { content: ''; width: 23px; height: 1px; background: #777; }
+.story-tab { display: flex; align-items: center; gap: 12px; color: #c9c8c3; text-align: left; font-size: .88rem; padding: 8px 0; border: 0; transition: color .2s ease; text-shadow: 0 1px 10px rgba(0, 0, 0, .65); }
+.story-tab::before { content: ''; width: 23px; height: 1px; background: #9b9a95; }
 .story-tab.is-active, .story-tab:hover, .story-tab:focus-visible { color: #fff; }
 .story-tab.is-active::before { background: #fff; height: 2px; }
 .story-tab__number { font-variant-numeric: tabular-nums; }
 @media (max-width: 900px) {
  .hero--stories, .stories-layout { min-height: 0; }
  .stories-layout { display: block; padding-block: 0; }
- .stories-copy { padding: 72px 0 38px; }
- .stories-copy .display-1 { font-size: clamp(2.8rem, 8vw, 5rem); }
+ .stories-copy { padding: 48px 0 26px; }
+ .stories-copy .display-1 { font-size: clamp(2.5rem, 7.5vw, 4.2rem); line-height: 1.05; }
+ .hero--stories .lead { margin-top: 14px; }
+ .story-controls { margin-top: 18px; }
+ .hero--stories .actions { margin-top: 20px; }
  .stories-stage { position: relative; inset: auto; width: calc(100% + 2 * var(--gutter)); margin-inline: calc(-1 * var(--gutter)); height: clamp(360px, 65vw, 600px); }
- .stories-stage__shade { background: linear-gradient(0deg,rgba(9,9,10,.65),transparent 55%); }
- .stories-tabs { top: auto; right: 20px; bottom: 18px; transform: none; flex-direction: row; flex-wrap: wrap; gap: 8px 16px; }
- .story-tab { font-size: .77rem; }
- .story-tab::before { width: 12px; }
+ .stories-stage__shade { background: linear-gradient(0deg, rgba(9, 9, 10, .72), transparent 48%); }
+ /* Compact numbered story navigation: one row, active story shows its label */
+ .stories-tabs {
+   top: auto; left: 50%; right: auto; bottom: 14px;
+   transform: translateX(-50%);
+   flex-direction: row; flex-wrap: nowrap;
+   gap: 2px;
+   max-width: calc(100% - 32px);
+   background: rgba(9, 9, 10, .58);
+   -webkit-backdrop-filter: blur(8px);
+   backdrop-filter: blur(8px);
+   border: 1px solid rgba(255, 255, 255, .14);
+   border-radius: 100px;
+   padding: 4px;
+ }
+ .story-tab { gap: 7px; font-size: .8rem; padding: 11px 13px; min-height: 44px; color: #e3e2de; border-radius: 100px; text-shadow: none; white-space: nowrap; }
+ .story-tab::before { display: none; }
+ /* Inactive labels stay available to assistive tech but only the number is shown */
+ .story-tab span:not(.story-tab__number) {
+   position: absolute; width: 1px; height: 1px; margin: -1px;
+   clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+ }
+ .story-tab.is-active span:not(.story-tab__number) {
+   position: static; width: auto; height: auto; margin: 0;
+   clip-path: none; overflow: visible;
+ }
+ .story-tab.is-active { background: var(--white); color: var(--black); font-weight: 600; }
 }
 @media (max-width: 560px) {
- .stories-copy { padding-top: 56px; }
- .stories-stage { height: 370px; }
- .stories-tabs { left: 16px; right: 16px; justify-content: center; }
- .story-tab { gap: 5px; }
- .story-tab::before { display: none; }
- .story-controls { gap: 12px; }
+ .stories-copy { padding: 36px 0 20px; }
+ .stories-copy .display-1 { font-size: clamp(2.3rem, 10.5vw, 2.8rem); }
+ .hero--stories .lead { font-size: 1.02rem; max-width: none; }
+ .story-controls { margin-top: 15px; gap: 12px; }
+ .story-play { width: 44px; height: 44px; }
+ .hero--stories .actions { margin-top: 16px; gap: 9px; }
+ .hero--stories .actions .btn { padding: 13px 18px; }
+ .stories-stage { height: min(112vw, 440px); }
+ .story-tab { font-size: .77rem; padding: 11px 11px; }
 }
 @media (prefers-reduced-motion: reduce) { .story-tab { transition: none; } }
 
