@@ -1,21 +1,52 @@
-# OutLiners website — MVP
+# OutLiners website
 
-This repository contains a first bilingual EN/EL responsive single-page prototype in `index.html`. It is **not deployed** to outliners.gr.
+Bilingual (EN/EL) static website for **OutLiners — Boutique Recruitment & Talent Advisory**, built from `docs/WEBSITE_MASTER_BRIEF.md`. It is **not deployed** to outliners.gr.
+
+## Structure
+
+```
+index.html                                  Home
+services/index.html                         Services overview
+services/recruitment-executive-search/      Service detail
+services/embedded-talent-partner/           Service detail
+services/talent-advisory/                   Service detail
+industries/index.html                       Sector focus
+about/index.html                            About + candidate channel
+contact/index.html                          Contact details (no form yet — see below)
+privacy-policy/ , cookies/                  Legal drafts, pending legal review
+404.html                                    Not-found page
+assets/css/styles.css                       Design system (monochrome, tokens, responsive)
+assets/js/main.js                           Language toggle, mobile nav, reveal, year
+assets/fonts/InterVariable.woff2            Self-hosted Inter (OFL, license alongside)
+assets/img/                                 Provisional logo mark, OG image, touch icon
+sitemap.xml , robots.txt , favicon.svg
+```
+
+No build step, no dependencies, no trackers, no cookies. The language preference is kept in `localStorage` only.
 
 ## Local preview
-Open `index.html` in a browser. No build dependencies. Language toggle switches between English and Greek.
+
+Pages use root-relative URLs, so preview with a local server rather than `file://`:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open <http://localhost:8000>. The ΕΛ/EN button toggles languages and persists the choice.
 
 ## Brand
-The owner supplied an image of the original OutLiners black-and-white business card. Preserve the nested-square mark and existing wordmark. **Current CSS mark is only a provisional approximation**; replace it with a clean crop of the owner's actual logo or, preferably, the original vector asset before deployment. Do not redesign the logo.
 
-## Claude Code next tasks
-1. Read `docs/WEBSITE_MASTER_BRIEF.md` and this README.
-2. Replace provisional CSS brand symbol/wordmark with the supplied real logo asset once it is committed to `assets/`.
-3. Refactor prototype into maintainable components if needed; preserve bilingual content and responsiveness.
-4. Implement real page routing and appropriate legal/privacy pages; do not invent legal policy text.
-5. Add working contact form with spam prevention and privacy disclosure only after email provider is selected.
-6. Run accessibility, SEO, mobile, performance and cross-browser checks.
-7. Work in a feature branch and open a PR for review. Do not deploy or modify DNS without owner approval.
+The owner supplied an image of the original OutLiners black-and-white business card. The nested-square mark in `assets/img/logo-mark.svg` (and inlined in headers/footers) is a **provisional approximation** — replace it with the owner's original vector asset before deployment. Do not redesign the logo.
+
+## Deliberately not included yet (pending owner decisions)
+
+- **Contact form** — waiting on email provider choice; spam protection and privacy disclosure come with it.
+- **Public pricing** for Embedded Talent Partner — pages say "Request a tailored proposal" per the brief.
+- **Final legal text** — privacy/cookies pages are clearly-marked drafts; do not invent policy text.
+- **Real `/el/` routes with hreflang** — Greek is currently a client-side toggle; dedicated localized URLs need a static-site generator or hosting rewrite decision (stack is an open decision in the brief).
+- **Client names, testimonials, credentials** — nothing unverified is published.
+- Deployment, hosting, DNS — owner approval required.
 
 ## Pending approvals
-Confirm contact details, logo master asset, privacy/cookie language, client references, hosting, and final content. Pricing is intentionally omitted from the public MVP.
+
+Confirm contact details (email, phones, whether the street address appears), logo master asset and display capitalization, privacy/cookie language, client references, hosting/stack, and final bilingual copy.
