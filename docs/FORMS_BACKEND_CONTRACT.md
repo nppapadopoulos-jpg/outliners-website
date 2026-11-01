@@ -1,6 +1,8 @@
 # OutLiners intake forms — backend integration contract (v1.0)
 
-Status: agreed frontend contract, backend **not yet implemented**. The forms on
+Status: **implemented** in `api/` (hosting-independent core, locally tested —
+see `api/README.md`) but **not deployed**; deployment runbook in
+`docs/BACKEND_DEPLOYMENT.md`. The forms on
 `/request-talent/` and `/submit-cv/` (and their `/el/` counterparts) are live in
 **preview mode**: `assets/js/intake.js` always prevents submission while the
 form carries `data-preview="true"`, so no data leaves the visitor's browser.
