@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request Talent — OutLiners</title>
+<meta name="description" content="Tell OutLiners about the role you're hiring for: executive search, specialist recruitment and embedded talent support for companies in Greece and internationally.">
+<link rel="canonical" href="https://outliners.gr/request-talent/">
+<link rel="alternate" hreflang="en" href="https://outliners.gr/request-talent/">
+<link rel="alternate" hreflang="el" href="https://outliners.gr/el/request-talent/">
+<link rel="alternate" hreflang="x-default" href="https://outliners.gr/request-talent/">
+<meta name="theme-color" content="#0b0b0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OutLiners">
+<meta property="og:title" content="Request Talent — OutLiners">
+<meta property="og:description" content="Tell OutLiners about the role you're hiring for: executive search, specialist recruitment and embedded talent support for companies in Greece and internationally.">
+<meta property="og:url" content="https://outliners.gr/request-talent/">
+<meta property="og:image" content="https://outliners.gr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="el_GR">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <nav class="nav wrap" aria-label="Main">
+    <a class="brand" href="/"><img src="/assets/img/logo-white.png" alt="OutLiners" width="618" height="88" decoding="async"></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/services/">Services</a>
+      <a href="/industries/">Industries</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href="/request-talent/" aria-current="page">Request Talent</a>
+    </div>
+    <div class="nav-tools">
+      <a class="lang-toggle" href="/el/request-talent/" hreflang="el" lang="el" aria-label="Ελληνική έκδοση">ΕΛ</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links"><span class="visually-hidden">Menu</span><span class="bars" aria-hidden="true"></span></button>
+    </div>
+  </nav>
+</header>
+<main id="main">
+<section class="page-hero">
+  <div class="wrap">
+    <span class="kicker">For companies</span>
+    <h1 class="display-1">Great teams start<br>with the right people.</h1>
+    <p class="lead">Tell us about the role you're hiring for. We'll review your request and come back to you to discuss how we can help — in confidence, and with no obligation.</p>
+  </div>
+</section>
+
+<section class="section intake-section" aria-labelledby="form-h">
+  <div class="wrap">
+    <p class="preview-badge" role="note">Preview — submissions are not yet active. The form goes live once the secure backend is connected.</p>
+    <h2 class="visually-hidden" id="form-h">Hiring request form</h2>
+    <form class="intake-form" action="/api/request-talent" method="post" enctype="multipart/form-data" novalidate data-preview="true">
+      <div class="hp-field" aria-hidden="true">
+        <label for="rt-website">Website</label>
+        <input id="rt-website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" name="form_started_at" value="">
+      <input type="hidden" name="lang" value="en">
+      <div class="form-grid">
+      <div class="field" data-error="Please enter your full name.">
+        <label for="rt-name">Full name</label>
+        <input id="rt-name" name="full_name" type="text" autocomplete="name" required aria-required="true">
+        <p class="field-error" id="rt-name-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please enter your company name.">
+        <label for="rt-company">Company name</label>
+        <input id="rt-company" name="company" type="text" autocomplete="organization" required aria-required="true">
+        <p class="field-error" id="rt-company-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please enter your business email." data-error-format="Please enter a valid email address.">
+        <label for="rt-email">Business email</label>
+        <input id="rt-email" name="email" type="email" autocomplete="email" required aria-required="true">
+        <p class="field-error" id="rt-email-error" hidden></p>
+      </div>
+      <div class="field" data-error="">
+        <label for="rt-phone">Phone <span class="hint">optional</span></label>
+        <input id="rt-phone" name="phone" type="tel" autocomplete="tel">
+        <p class="field-error" id="rt-phone-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please enter the role you are hiring for.">
+        <label for="rt-title">Job title / position</label>
+        <input id="rt-title" name="job_title" type="text" required aria-required="true">
+        <p class="field-error" id="rt-title-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please enter the role's location.">
+        <label for="rt-location">Location</label>
+        <input id="rt-location" name="location" type="text" required aria-required="true" placeholder="e.g. Athens, hybrid, remote">
+        <p class="field-error" id="rt-location-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please choose an employment type.">
+        <label for="rt-type">Employment type</label>
+        <select id="rt-type" name="employment_type" required aria-required="true"><option value="" selected disabled>Select…</option><option value="full-time">Full-time</option><option value="part-time">Part-time</option><option value="contract-interim">Contract / Interim</option><option value="executive">Executive / Leadership</option><option value="other">Other</option></select>
+        <p class="field-error" id="rt-type-error" hidden></p>
+      </div>
+      <div class="field" data-error="Please choose a hiring timeline.">
+        <label for="rt-timeline">Hiring timeline</label>
+        <select id="rt-timeline" name="timeline" required aria-required="true"><option value="" selected disabled>Select…</option><option value="asap">As soon as possible</option><option value="1-month">Within 1 month</option><option value="1-3-months">1–3 months</option><option value="3-plus-months">3+ months</option><option value="exploring">Exploring options</option></select>
+        <p class="field-error" id="rt-timeline-error" hidden></p>
+      </div>
+      <div class="field" data-error="">
+        <label for="rt-salary">Salary range <span class="hint">optional</span></label>
+        <input id="rt-salary" name="salary_range" type="text" placeholder="e.g. €45–55k">
+        <p class="field-error" id="rt-salary-error" hidden></p>
+      </div>
+      <div class="field field--full" data-error="Please describe the role.">
+        <label for="rt-jd">Job description</label>
+        <textarea id="rt-jd" name="job_description" required aria-required="true" maxlength="5000" rows="6"></textarea>
+        <p class="field-error" id="rt-jd-error" hidden></p>
+      </div>
+      <div class="field field--full field--file" data-error-type="Please upload a PDF or DOCX file." data-error-size="The file must be 5 MB or smaller.">
+        <label for="rt-file">Job description attachment <span class="hint">optional — PDF or DOCX, max 5 MB</span></label>
+        <input id="rt-file" name="attachment" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+        <p class="field-error" id="rt-file-error" hidden></p>
+      </div>
+      <div class="field field--full consent" data-error="Please confirm you agree to the processing of your details.">
+        <input id="rt-consent" name="consent" type="checkbox" value="yes" required aria-required="true">
+        <label for="rt-consent">I agree that OutLiners may process the information submitted with this form in order to respond to my request, as described in the <a href="/privacy-policy/">Privacy Policy</a>.</label>
+        <p class="field-error" id="rt-consent-error" hidden></p>
+      </div>
+      <p class="legal-note">Consent wording is a draft pending legal review before launch.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit">Send hiring request <span class="arrow" aria-hidden="true">→</span></button>
+      </div>
+      <p class="form-status" id="rt-status" role="status" tabindex="-1" hidden>This form is in preview: nothing was sent and no data left your browser. Submissions will be enabled once the secure backend is live — in the meantime, please use the <a href="/contact/">contact page</a>.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section intake-section intake-section--steps" aria-labelledby="next-h">
+  <div class="wrap">
+    <span class="kicker">What happens next</span>
+    <h2 class="display-2" id="next-h">Clear from<br>the first step.</h2>
+    <ol class="steps steps--three" style="list-style:none;margin:0;padding:0"><li class="step reveal"><span class="num">01</span><h3>We review</h3><p>A senior consultant reads every request — no automated triage.</p></li><li class="step reveal"><span class="num">02</span><h3>We respond</h3><p>We come back to you to clarify scope, context and fit.</p></li><li class="step reveal"><span class="num">03</span><h3>We propose</h3><p>You receive a clear, tailored proposal in plain language.</p></li></ol>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="brand" href="/"><img src="/assets/img/logo-white.png" alt="OutLiners" width="618" height="88" decoding="async"></a>
+        <p>Boutique recruitment &amp; talent advisory partner. Based in Athens, working with companies in Greece and internationally.</p>
+      </div>
+      <nav class="footer-col" aria-label="Services">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="/services/recruitment-executive-search/">Recruitment &amp; Executive Search</a></li>
+          <li><a href="/services/embedded-talent-partner/">Embedded Talent Partner</a></li>
+          <li><a href="/services/talent-advisory/">Talent &amp; HR Advisory</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Company">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="/industries/">Industries</a></li>
+          <li><a href="/about/">About</a></li>
+          <li><a href="/contact/">Contact</a></li>
+          <li><a href="/request-talent/">Request Talent</a></li>
+          <li><a href="/submit-cv/">Submit Your CV</a></li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:nikos@outliners.gr">nikos@outliners.gr</a></li>
+          <li><a href="tel:+302102206951">+30 210 22 06 951</a></li>
+          <li><a href="tel:+306938114666">+30 693 81 14 666</a></li>
+          <li>Athens, Greece</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2025</span> OutLiners. All rights reserved.</span>
+      <span><a href="/privacy-policy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="/cookies/">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/main.js" defer></script>
+<script src="/assets/js/intake.js" defer></script>
+</body>
+</html>

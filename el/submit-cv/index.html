@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Υποβολή Βιογραφικού — OutLiners</title>
+<meta name="description" content="Μοιραστείτε το βιογραφικό σας με την OutLiners εμπιστευτικά. Δεν προωθούμε ποτέ το προφίλ σας χωρίς τη ρητή συγκατάθεσή σας.">
+<link rel="canonical" href="https://outliners.gr/el/submit-cv/">
+<link rel="alternate" hreflang="en" href="https://outliners.gr/submit-cv/">
+<link rel="alternate" hreflang="el" href="https://outliners.gr/el/submit-cv/">
+<link rel="alternate" hreflang="x-default" href="https://outliners.gr/submit-cv/">
+<meta name="theme-color" content="#0b0b0c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OutLiners">
+<meta property="og:title" content="Υποβολή Βιογραφικού — OutLiners">
+<meta property="og:description" content="Μοιραστείτε το βιογραφικό σας με την OutLiners εμπιστευτικά. Δεν προωθούμε ποτέ το προφίλ σας χωρίς τη ρητή συγκατάθεσή σας.">
+<meta property="og:url" content="https://outliners.gr/el/submit-cv/">
+<meta property="og:image" content="https://outliners.gr/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="el_GR">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Μετάβαση στο περιεχόμενο</a>
+<header class="site-header">
+  <nav class="nav wrap" aria-label="Κύριο μενού">
+    <a class="brand" href="/el/"><img src="/assets/img/logo-white.png" alt="OutLiners" width="618" height="88" decoding="async"></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/el/services/">Υπηρεσίες</a>
+      <a href="/el/industries/">Κλάδοι</a>
+      <a href="/el/about/">Σχετικά</a>
+      <a href="/el/contact/">Επικοινωνία</a>
+      <a href="/el/request-talent/">Ζητήστε ταλέντο</a>
+    </div>
+    <div class="nav-tools">
+      <a class="lang-toggle" href="/submit-cv/" hreflang="en" lang="en" aria-label="English version">EN</a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="nav-links"><span class="visually-hidden">Μενού</span><span class="bars" aria-hidden="true"></span></button>
+    </div>
+  </nav>
+</header>
+<main id="main">
+<section class="page-hero">
+  <div class="wrap">
+    <span class="kicker">Για υποψηφίους</span>
+    <h1 class="display-1">Η καριέρα σας αξίζει τη σωστή ευκαιρία.</h1>
+    <p class="lead">Μοιραστείτε το προφίλ σας μαζί μας εμπιστευτικά. Δεν προωθούμε ποτέ το βιογραφικό σας χωρίς τη ρητή συγκατάθεσή σας — και επικοινωνούμε μόνο όταν μια ευκαιρία σας ταιριάζει πραγματικά.</p>
+  </div>
+</section>
+
+<section class="section intake-section" aria-labelledby="form-h">
+  <div class="wrap">
+    <p class="preview-badge" role="note">Προεπισκόπηση — οι υποβολές δεν είναι ακόμη ενεργές. Η φόρμα θα ενεργοποιηθεί μόλις συνδεθεί η ασφαλής υποδομή.</p>
+    <h2 class="visually-hidden" id="form-h">Φόρμα εγγραφής υποψηφίου</h2>
+    <form class="intake-form" action="/api/submit-cv" method="post" enctype="multipart/form-data" novalidate data-preview="true">
+      <div class="hp-field" aria-hidden="true">
+        <label for="cv-website">Ιστότοπος</label>
+        <input id="cv-website" name="website" type="text" tabindex="-1" autocomplete="off">
+      </div>
+      <input type="hidden" name="form_started_at" value="">
+      <input type="hidden" name="lang" value="el">
+      <div class="form-grid">
+      <div class="field" data-error="Παρακαλούμε συμπληρώστε το ονοματεπώνυμό σας.">
+        <label for="cv-name">Ονοματεπώνυμο</label>
+        <input id="cv-name" name="full_name" type="text" autocomplete="name" required aria-required="true">
+        <p class="field-error" id="cv-name-error" hidden></p>
+      </div>
+      <div class="field" data-error="Παρακαλούμε συμπληρώστε το email σας." data-error-format="Παρακαλούμε συμπληρώστε μια έγκυρη διεύθυνση email.">
+        <label for="cv-email">Email</label>
+        <input id="cv-email" name="email" type="email" autocomplete="email" required aria-required="true">
+        <p class="field-error" id="cv-email-error" hidden></p>
+      </div>
+      <div class="field" data-error="Παρακαλούμε συμπληρώστε το τηλέφωνό σας.">
+        <label for="cv-phone">Τηλέφωνο</label>
+        <input id="cv-phone" name="phone" type="tel" autocomplete="tel" required aria-required="true">
+        <p class="field-error" id="cv-phone-error" hidden></p>
+      </div>
+      <div class="field" data-error="Παρακαλούμε συμπληρώστε την ειδίκευσή σας.">
+        <label for="cv-spec">Επαγγελματική ειδίκευση</label>
+        <input id="cv-spec" name="specialization" type="text" required aria-required="true" placeholder="π.χ. software engineering, οικονομικά, marketing">
+        <p class="field-error" id="cv-spec-error" hidden></p>
+      </div>
+      <div class="field" data-error="Παρακαλούμε συμπληρώστε την προτιμώμενη τοποθεσία.">
+        <label for="cv-location">Προτιμώμενη τοποθεσία</label>
+        <input id="cv-location" name="preferred_location" type="text" required aria-required="true" placeholder="π.χ. Αθήνα, εξ αποστάσεως, ανοιχτός/ή σε μετεγκατάσταση">
+        <p class="field-error" id="cv-location-error" hidden></p>
+      </div>
+      <div class="field" data-error="" data-error-format="Παρακαλούμε συμπληρώστε έναν έγκυρο σύνδεσμο (ξεκινά με https://).">
+        <label for="cv-linkedin">Προφίλ LinkedIn <span class="hint">προαιρετικό</span></label>
+        <input id="cv-linkedin" name="linkedin" type="url" placeholder="https://linkedin.com/in/…">
+        <p class="field-error" id="cv-linkedin-error" hidden></p>
+      </div>
+      <div class="field field--full" data-error="">
+        <label for="cv-intro">Σύντομη παρουσίαση <span class="hint">προαιρετικό</span></label>
+        <textarea id="cv-intro" name="introduction" maxlength="1500" rows="6"></textarea>
+        <p class="field-error" id="cv-intro-error" hidden></p>
+      </div>
+      <div class="field field--full field--file" data-error="Παρακαλούμε επισυνάψτε το βιογραφικό σας." data-error-type="Παρακαλούμε ανεβάστε αρχείο PDF ή DOCX." data-error-size="Το αρχείο πρέπει να είναι έως 5 MB.">
+        <label for="cv-file">Βιογραφικό <span class="hint">PDF ή DOCX, έως 5 MB</span></label>
+        <input id="cv-file" name="cv" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required aria-required="true">
+        <p class="field-error" id="cv-file-error" hidden></p>
+      </div>
+      <div class="field field--full consent" data-error="Παρακαλούμε επιβεβαιώστε ότι συμφωνείτε με την επεξεργασία των στοιχείων σας.">
+        <input id="cv-consent" name="consent" type="checkbox" value="yes" required aria-required="true">
+        <label for="cv-consent">Συμφωνώ με την επεξεργασία των στοιχείων αυτής της φόρμας από την OutLiners για την απάντηση στο αίτημά μου, όπως περιγράφεται στην <a href="/el/privacy-policy/">Πολιτική Απορρήτου</a>.</label>
+        <p class="field-error" id="cv-consent-error" hidden></p>
+      </div>
+      <p class="legal-note">Η διατύπωση της συγκατάθεσης είναι προσχέδιο και εκκρεμεί νομικός έλεγχος πριν από τη δημοσίευση.</p>
+      </div>
+      <div class="actions">
+        <button class="btn" type="submit">Υποβολή βιογραφικού <span class="arrow" aria-hidden="true">→</span></button>
+      </div>
+      <p class="form-status" id="cv-status" role="status" tabindex="-1" hidden>Η φόρμα βρίσκεται σε προεπισκόπηση: δεν στάλθηκε τίποτα και κανένα στοιχείο δεν έφυγε από το πρόγραμμα περιήγησής σας. Οι υποβολές θα ενεργοποιηθούν μόλις λειτουργήσει η ασφαλής υποδομή — στο μεταξύ, χρησιμοποιήστε τη <a href="/el/contact/">σελίδα επικοινωνίας</a>.</p>
+    </form>
+  </div>
+</section>
+
+<section class="section intake-section intake-section--steps" aria-labelledby="next-h">
+  <div class="wrap">
+    <span class="kicker">Τα επόμενα βήματα</span>
+    <h2 class="display-2" id="next-h">Διακριτικά,<br>εξ ορισμού.</h2>
+    <ol class="steps steps--three" style="list-style:none;margin:0;padding:0"><li class="step reveal"><span class="num">01</span><h3>Διαβάζουμε</h3><p>Το προφίλ σας το αξιολογεί άνθρωπος, όχι αλγόριθμος.</p></li><li class="step reveal"><span class="num">02</span><h3>Το κρατάμε εμπιστευτικό</h3><p>Τίποτα δεν κοινοποιείται σε κανέναν χωρίς τη ρητή συγκατάθεσή σας.</p></li><li class="step reveal"><span class="num">03</span><h3>Επικοινωνούμε</h3><p>Όταν μια θέση ταιριάζει πραγματικά στο προφίλ και τους στόχους σας, μιλάμε.</p></li></ol>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="brand" href="/el/"><img src="/assets/img/logo-white.png" alt="OutLiners" width="618" height="88" decoding="async"></a>
+        <p>Εταιρεία υπηρεσιών στελέχωσης και συμβουλευτικής &amp; ανθρώπινου δυναμικού. Με έδρα την Αθήνα, συνεργαζόμαστε με επιχειρήσεις στην Ελλάδα και διεθνώς.</p>
+      </div>
+      <nav class="footer-col" aria-label="Υπηρεσίες">
+        <h4>Υπηρεσίες</h4>
+        <ul>
+          <li><a href="/el/services/recruitment-executive-search/">Στελέχωση &amp; Executive Search</a></li>
+          <li><a href="/el/services/embedded-talent-partner/">Embedded Talent Partner</a></li>
+          <li><a href="/el/services/talent-advisory/">Συμβουλευτική Ανθρώπινου Δυναμικού</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Εταιρεία">
+        <h4>Εταιρεία</h4>
+        <ul>
+          <li><a href="/el/industries/">Κλάδοι</a></li>
+          <li><a href="/el/about/">Σχετικά με εμάς</a></li>
+          <li><a href="/el/contact/">Επικοινωνία</a></li>
+          <li><a href="/el/request-talent/">Ζητήστε ταλέντο</a></li>
+          <li><a href="/el/submit-cv/">Υποβολή βιογραφικού</a></li>
+        </ul>
+      </nav>
+      <div class="footer-col">
+        <h4>Επικοινωνία</h4>
+        <ul>
+          <li><a href="mailto:nikos@outliners.gr">nikos@outliners.gr</a></li>
+          <li><a href="tel:+302102206951">+30 210 22 06 951</a></li>
+          <li><a href="tel:+306938114666">+30 693 81 14 666</a></li>
+          <li>Αθήνα, Ελλάδα</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year>2025</span> OutLiners. Με επιφύλαξη παντός δικαιώματος.</span>
+      <span><a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> &nbsp;·&nbsp; <a href="/el/cookies/">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+<script src="/assets/js/main.js" defer></script>
+<script src="/assets/js/intake.js" defer></script>
+</body>
+</html>

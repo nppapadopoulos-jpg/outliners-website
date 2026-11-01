@@ -8,6 +8,8 @@ Bilingual (EN/EL) static website for **OutLiners — Boutique Recruitment & Tale
 index.html                                  Home (English)
 services/ , industries/ , about/ ,
 contact/ , privacy-policy/ , cookies/       English pages
+request-talent/ , submit-cv/               Bilingual intake forms (preview mode —
+                                            see docs/FORMS_BACKEND_CONTRACT.md)
 el/…                                        Greek mirror of every page (crawlable
                                             /el/ URLs, hreflang-linked both ways)
 404.html                                    Not-found page (bilingual, noindex)
@@ -52,9 +54,16 @@ The site uses the **authentic OutLiners logo** supplied by the owner as transpar
 
 Proportions, typography and the square symbol are untouched — the files are trimmed crops of the owner's artwork, never redrawn. If an original vector (SVG/PDF) master becomes available, swap it in for crisper rendering at large sizes; raster PNGs at this resolution (1236×176) are sharp at all current usages.
 
-## Proposed contact form (not yet active — needs owner approval)
+## Intake forms (preview mode)
 
-The contact page currently offers prominent email/phone actions only. Recommended next step, pending the owner's choice of provider: a small static form posting to an EU-hosted, GDPR-conscious endpoint (e.g. a form backend with EU data residency, or a serverless function on the chosen hosting that relays to `nikos@outliners.gr`), with a honeypot field + time-based spam check (no CAPTCHA tracking), an explicit consent checkbox linking to the finished privacy policy, and no third-party scripts on the page. Nothing is wired up until a provider is approved.
+`/request-talent/` and `/submit-cv/` (plus `/el/` counterparts) carry complete,
+validated form UIs that are **deliberately not wired to anything**: submission
+is blocked in `assets/js/intake.js` while the forms carry `data-preview="true"`,
+and a visible notice says so. No data leaves the visitor's browser. The full
+backend specification — Azure Functions endpoints, field contract, file rules,
+spam controls, EU-region private storage, notification to `info@outliners.gr`,
+GDPR and ATS/CRM readiness — lives in `docs/FORMS_BACKEND_CONTRACT.md`.
+Consent wording on the forms is a clearly-marked draft pending legal review.
 
 ## Deliberately not included yet (pending owner decisions)
 
