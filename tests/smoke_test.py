@@ -89,6 +89,39 @@ def main():
             if "alt=" not in img:
                 err(f"{rel}: <img> without alt")
 
+        # Authentic logo in header on every page
+        if '<a class="brand"' in html and "assets/img/logo-white.png" not in html:
+            err(f"{rel}: header brand is not the authentic logo asset")
+
+        # Language switch: each page links to its exact counterpart
+        if not is_404:
+            page_url = "/" + rel.replace(os.sep, "/")
+            page_url = re.sub(r"index\.html$", "", page_url)
+            if is_greek:
+                counterpart = page_url[len("/el"):] or "/"
+                want = f'class="lang-toggle" href="{counterpart}" hreflang="en"'
+            else:
+                counterpart = "/el" + page_url
+                want = f'class="lang-toggle" href="{counterpart}" hreflang="el"'
+            if want not in html:
+                err(f"{rel}: language switch does not link to {counterpart}")
+            # hreflang alternates must name this page and its counterpart
+            en_url = counterpart if is_greek else page_url
+            el_url = page_url if is_greek else counterpart
+            for code, u in (("en", en_url), ("el", el_url)):
+                if f'hreflang="{code}" href="{SITE}{u}"' not in html:
+                    err(f"{rel}: hreflang '{code}' does not point to {u}")
+            # canonical must be this page's own URL
+            if f'rel="canonical" href="{SITE}{page_url}"' not in html:
+                err(f"{rel}: canonical is not {page_url}")
+
+        # Main navigation present and complete
+        if not is_404:
+            prefix = "/el" if is_greek else ""
+            for target in ("/services/", "/industries/", "/about/", "/contact/"):
+                if f'href="{prefix}{target}"' not in html:
+                    err(f"{rel}: navigation is missing link to {prefix}{target}")
+
     # Sitemap entries resolve and cover both languages
     sitemap = open(os.path.join(ROOT, "sitemap.xml"), encoding="utf-8").read()
     locs = re.findall(r"<loc>([^<]+)</loc>", sitemap)
