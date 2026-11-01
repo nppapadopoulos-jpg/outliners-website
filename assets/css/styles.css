@@ -599,3 +599,22 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
   .brand img { height: 22px; }
   .actions .btn { width: 100%; justify-content: center; }
 }
+
+/* Editorial meeting-room hero: shared visual, original content and navigation retained. */
+.hero--photo { padding-block: clamp(64px, 8vw, 112px); }
+.hero__layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .94fr); align-items: center; gap: clamp(30px, 5vw, 80px); }
+.hero__copy { min-width: 0; }
+.hero__copy .display-1 { font-size: clamp(2.9rem, 5vw, 5.5rem); }
+.hero__copy .lead { max-width: 53ch; }
+.hero__visual { margin: 0; overflow: hidden; min-width: 0; aspect-ratio: 4 / 5; background: #242424; }
+.hero__visual img { width: 100%; height: 100%; object-fit: cover; object-position: 52% center; filter: grayscale(100%); }
+@media (max-width: 900px) {
+  .hero__layout { grid-template-columns: 1fr; gap: 42px; }
+  .hero__visual { aspect-ratio: 16 / 10; }
+  .hero__copy .display-1 { font-size: var(--step-5); }
+}
+@media (max-width: 560px) {
+  .hero--photo { padding-block: 62px 72px; }
+  .hero__visual { aspect-ratio: 4 / 3; }
+  .hero__visual img { object-position: center; }
+}
