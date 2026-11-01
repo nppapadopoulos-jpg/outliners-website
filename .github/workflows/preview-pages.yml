@@ -1,0 +1,46 @@
+name: Preview (GitHub Pages)
+
+# Isolated preview deployment: runs ONLY on the dedicated preview branch and
+# publishes ONLY the built _preview artifact (site pages + assets, noindexed).
+# No backend, docs, tests or server-side source are included in the artifact.
+
+on:
+  push:
+    branches: ["preview/github-pages"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure GitHub Pages (enables Pages if permitted)
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Build preview with subpath + noindex
+        run: node preview/build.mjs
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _preview
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
