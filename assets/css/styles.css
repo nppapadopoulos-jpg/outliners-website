@@ -667,3 +667,15 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
  .story-controls { gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) { .story-tab { transition: none; } }
+
+/* Crossfade layers for the four-stories hero. Both images stack in the stage;
+   the global prefers-reduced-motion rule collapses the fade to an instant swap. */
+.stories-stage .story-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity .9s var(--ease);
+}
+.stories-stage .story-image.is-active { opacity: 1; }

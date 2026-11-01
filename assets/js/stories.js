@@ -33,16 +33,31 @@
     stopTimer();
     if (playing && !document.hidden) timer = setInterval(() => select((current + 1) % tabs.length, false), 6000);
   };
+  // Second image layer for smooth crossfades. The global reduced-motion CSS
+  // collapses the opacity transition, so the swap is instant for those users.
+  let front = image;
+  let back = image.cloneNode();
+  back.classList.remove('is-active');
+  back.removeAttribute('fetchpriority');
+  back.removeAttribute('src');
+  back.setAttribute('aria-hidden', 'true');
+  front.insertAdjacentElement('afterend', back);
   async function select(index, userAction) {
     if (userAction) schedule();
     const id = ++requestId;
     const asset = await preload(index);
     if (id !== requestId) return;
-    // Keep the existing approved photo as a safe fallback until standalone assets arrive.
-    if (asset) {
-      image.src = asset.src;
-      image.width = asset.naturalWidth;
-      image.height = asset.naturalHeight;
+    if (asset && !front.src.endsWith('/' + paths[index])) {
+      back.width = asset.naturalWidth;
+      back.height = asset.naturalHeight;
+      back.src = asset.src;
+      const outgoing = front, incoming = back;
+      requestAnimationFrame(() => {
+        incoming.classList.add('is-active');
+        outgoing.classList.remove('is-active');
+      });
+      front = incoming;
+      back = outgoing;
     }
     current = index;
     tabs.forEach((tab, i) => {
