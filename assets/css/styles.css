@@ -708,3 +708,155 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
   transition: opacity .9s var(--ease);
 }
 .stories-stage .story-image.is-active { opacity: 1; }
+
+/* ==========================================================================
+   Intake pages (Request Talent / Submit Your CV)
+   Dark editorial forms; submission is preview-only until the backend lands.
+   ========================================================================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(18px, 2.5vw, 32px); }
+@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; gap: 8px; } }
+
+.intake-section { background: var(--black); color: var(--white); padding-top: 0; }
+.intake-section--steps { background: var(--black-2); padding-top: clamp(64px, 8vw, 100px); }
+.steps--three { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .steps--three { grid-template-columns: 1fr; } }
+
+.preview-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #4a4a4c;
+  border-radius: 100px;
+  padding: 10px 18px;
+  font-size: .8rem;
+  letter-spacing: .02em;
+  color: #cfcecb;
+  margin: 0 0 clamp(30px, 4vw, 44px);
+}
+.preview-badge::before {
+  content: "";
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #cfcecb;
+  flex: none;
+}
+
+.intake-form { max-width: 780px; }
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px 36px;
+}
+.field--full { grid-column: 1 / -1; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; gap: 26px; } }
+
+.field label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 560;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #b5b4af;
+  margin-bottom: 10px;
+}
+.field .hint {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 450;
+  color: #8b8a85;
+  margin-left: 8px;
+}
+.field :is(input, select, textarea) {
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #3f3f41;
+  border-radius: 0;
+  color: var(--white);
+  font: inherit;
+  padding: 10px 2px 12px;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+}
+.field :is(input, select, textarea):focus {
+  outline: none;
+  border-bottom-color: var(--white);
+  box-shadow: 0 1px 0 var(--white);
+}
+.field ::placeholder { color: #6d6c68; opacity: 1; }
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' stroke='%23b5b4af' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+.field select:invalid { color: #6d6c68; }
+.field select option { color: var(--ink); background: var(--white); }
+.field textarea { min-height: 150px; resize: vertical; }
+
+.field--file input {
+  border: 1px dashed #4a4a4c;
+  padding: 20px 14px;
+  cursor: pointer;
+  font-size: .9rem;
+  color: #b5b4af;
+}
+.field--file input::file-selector-button {
+  background: var(--white);
+  color: var(--black);
+  border: 0;
+  padding: 9px 16px;
+  margin-right: 14px;
+  font: inherit;
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.field--file input:focus { border-color: var(--white); box-shadow: none; outline: 2px solid var(--white); outline-offset: 2px; }
+
+.field.has-error :is(input, select, textarea) { border-bottom-color: #e07e7e; }
+.field.has-error.field--file input { border-color: #e07e7e; }
+.field-error { color: #eda2a2; font-size: .86rem; line-height: 1.5; margin: 8px 0 0; }
+
+.consent { display: flex; align-items: flex-start; gap: 13px; }
+.consent input[type="checkbox"] {
+  width: 19px; height: 19px;
+  flex: none;
+  margin-top: 2px;
+  accent-color: var(--white);
+  border-bottom: 0;
+}
+.consent label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: .92rem;
+  font-weight: 450;
+  color: #cfcecb;
+  line-height: 1.6;
+  margin: 0;
+}
+.consent label a { color: var(--white); text-decoration: underline; text-underline-offset: .25em; }
+.consent .field-error { flex-basis: 100%; }
+
+.legal-note { font-size: .8rem; color: #8b8a85; margin-top: 14px; max-width: 64ch; }
+
+.intake-form .actions { margin-top: clamp(26px, 3.5vw, 38px); }
+.form-status {
+  border: 1px solid #4a4a4c;
+  padding: 16px 20px;
+  margin-top: 24px;
+  font-size: .92rem;
+  line-height: 1.65;
+  color: #dddcd8;
+  max-width: 64ch;
+}
+.form-status a { color: var(--white); text-decoration: underline; text-underline-offset: .25em; }
+
+.hp-field {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+}
