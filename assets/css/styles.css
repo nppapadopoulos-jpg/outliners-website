@@ -618,3 +618,11 @@ a.tag:hover { border-color: var(--ink); color: var(--ink); text-decoration: none
   .hero__visual { aspect-ratio: 4 / 3; }
   .hero__visual img { object-position: center; }
 }
+
+/* Selected partnerships: typographic placeholders until official logo assets are supplied. */
+.clients-section { padding-block: clamp(40px, 5vw, 68px); background: var(--paper); border-bottom: 1px solid var(--line); }
+.clients-section .kicker { margin-bottom: 28px; }
+.client-grid { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 22px 30px; margin: 0; padding: 0; align-items: center; }
+.client-name { font-size: clamp(.95rem, 1.45vw, 1.22rem); font-weight: 650; letter-spacing: -.035em; color: #565550; text-align: center; white-space: nowrap; }
+@media (max-width: 900px) { .client-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 20px; } }
+@media (max-width: 540px) { .client-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 12px; } .client-name { font-size: 1rem; } }
