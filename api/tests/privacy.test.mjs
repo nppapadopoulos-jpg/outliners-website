@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { makeHandler, makeFormData, makeRequest, body, testConfig } from "./helpers.mjs";
-import { ipHash, createLogger, deleteAfter } from "../src/core/privacy.js";
+import { ipHash, createLogger, deleteAfter, deleteAfterMonths } from "../src/core/privacy.js";
 
 const PERSONAL = ["Maria Papadaki", "maria.papadaki@example.org", "+30 699 123 4567", "maria-cv.pdf"];
 
@@ -48,4 +48,16 @@ test("data minimization: control fields are not stored; consent is stored as an 
   assert.ok(!("website" in record.fields) && !("form_started_at" in record.fields));
   assert.equal(record.consent.value, "yes");
   assert.ok(record.consent.recordedAt);
+});
+
+test("twelve calendar months handle leap days", () => {
+  assert.equal(deleteAfterMonths(12, Date.parse("2024-02-29T12:00:00Z")), "2025-02-28T12:00:00.000Z");
+  assert.equal(deleteAfterMonths(12, Date.parse("2025-03-01T12:00:00Z")), "2026-03-01T12:00:00.000Z");
+  assert.equal(deleteAfterMonths(null), null);
+});
+
+test("handler records calendar-month deletion deadline", async () => {
+  const { handle, stored } = makeHandler({ config: { retentionMonths: 12 } });
+  await handle("request-talent", makeRequest(makeFormData("request-talent")), {});
+  assert.equal(stored[0].record.deleteAfter, deleteAfterMonths(12, Date.parse(stored[0].record.receivedAt)));
 });
