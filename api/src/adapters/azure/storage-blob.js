@@ -43,6 +43,29 @@ export function createBlobStorage(env) {
       return base;
     },
 
+
+    // Resolve a submission by UUID without accepting arbitrary blob paths.
+    // Never expose a Blob URL, SAS token, or container credentials to callers.
+    async readSubmissionFile(id) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || "")) return null;
+      const c = await container();
+      for (const form of ["submit-cv"]) {
+        // Month is not supplied by the caller. Search only metadata paths.
+        for await (const blob of c.listBlobsFlat({ prefix: `submissions/${form}/` })) {
+          if (!blob.name.endsWith(`/${id}/submission.json`)) continue;
+          const base = blob.name.slice(0, -"/submission.json".length);
+          const recordBlob = await c.getBlockBlobClient(blob.name).downloadToBuffer();
+          const record = JSON.parse(recordBlob.toString("utf8"));
+          if (record.id !== id || !record.file?.name || (record.deleteAfter && Date.parse(record.deleteAfter) <= Date.now())) return null;
+          const filename = record.file.name;
+          if (filename.includes("/") || filename.includes("\\\\") || filename === "." || filename === "..") return null;
+          const bytes = await c.getBlockBlobClient(`${base}/${filename}`).downloadToBuffer();
+          return { bytes };
+        }
+      }
+      return null;
+    },
+
     // Data-subject deletion: remove every blob under the submission prefix.
     async deleteSubmission(relPath) {
       const c = await container();
