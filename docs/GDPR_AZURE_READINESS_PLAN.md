@@ -1,14 +1,14 @@
 # OutLiners — GDPR and Azure backend readiness plan (DRAFT)
 
-Decision recorded 2026-11-02: **proposed candidate CV retention = 24 months**, subject to documented purpose, lawful basis, transparency, and legal review. This is **not** a blanket rule for all personal data and is **not** approval to process live submissions.
+Decision recorded 2026-11-02: **proposed candidate CV retention = 12 months**, subject to documented purpose, lawful basis, transparency, and legal review. This is **not** a blanket rule for all personal data and is **not** approval to process live submissions.
 
 ## Retention design
-- Candidate CV and candidate-submission metadata: proposed 24 months from receipt; calculate a per-record `deleteAfter` timestamp. Define whether a later candidate interaction creates a new retention event only after legal review; never silently reset the clock.
+- Candidate CV and candidate-submission metadata: proposed 12 months from receipt; calculate a per-record `deleteAfter` timestamp. Define whether a later candidate interaction creates a new retention event only after legal review; never silently reset the clock.
 - Hiring requests/client contacts: separate purpose and retention decision **pending**.
 - Technical logs, spam counters, email notices, backups, and deletion records: separate minimization/retention schedules **pending**.
 - Candidate erasure requests: verify requester identity proportionately, delete earlier when applicable, including files and metadata; consider backups and any lawful exceptions.
 - Azure Blob lifecycle policies are age-based; verify they cover **all** objects in each submission folder (CV and metadata), not merely a subset. Verify deletion timing and that a request for earlier erasure can be fulfilled independently of lifecycle.
-- A scheduled deletion/lifecycle mechanism is required and must be tested with synthetic records before activation. `RETENTION_DAYS=730` is only a technical approximation of 24 calendar months; final implementation must choose and document exact calendar-month semantics and leap-day behavior.
+- A scheduled deletion/lifecycle mechanism is required and must be tested with synthetic records before activation. `RETENTION_DAYS=730` is only a technical approximation of 12 calendar months; final implementation must choose and document exact calendar-month semantics and leap-day behavior.
 
 ## Legal and operational prerequisites (not yet satisfied)
 1. Verify exact legal controller name, registered contact details, and privacy contact.
@@ -36,3 +36,10 @@ Decision recorded 2026-11-02: **proposed candidate CV retention = 24 months**, s
 6. Owner explicitly approves live form activation and DNS changes separately.
 
 Status: planning document only. No Azure resources created; no form submissions activated; no DNS changes.
+
+## Owner decision — simplest secure receipt workflow (2026-11-02)
+- Send a minimal email notification to info@outliners.gr with candidate name, contact and submission ID; **no CV attachment**.
+- The owner opens the CV from a secure owner-only authenticated view, preferably directly from the email notification, without needing to use Azure Portal.
+- Implement and test this owner-facing retrieval flow before go-live; it does **not** yet exist in the reference backend. Do not put public or long-lived file URLs in email. Require MFA, short-lived authorization, audit logging and explicit deletion controls.
+- Proposed candidate CV retention reduced from 24 to **12 calendar months**, subject to legal review and documented lawful basis. Keep other retention categories pending.
+- No forms activation, paid provisioning, DNS changes or publication authorized by this decision.
