@@ -10,7 +10,25 @@
   const greek = document.documentElement.lang === 'el';
   const paths = ['innovation.webp','vision.webp','responsibility.webp','determination.webp'];
   const loaded = new Map();
+  const caption = hero.querySelector('.story-caption');
+  const captionTitle = hero.querySelector('.story-caption__title');
+  const captionText = hero.querySelector('.story-caption__text');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let captionTimer = null;
+  function setCaption(index) {
+    if (!caption || !tabs[index].dataset.headline) return;
+    const { headline, text } = tabs[index].dataset;
+    if (captionTitle.textContent === headline) return;
+    const apply = () => {
+      captionTitle.textContent = headline;
+      captionText.textContent = text;
+      caption.classList.remove('is-out');
+    };
+    clearTimeout(captionTimer);
+    if (reduceMotion.matches) { apply(); return; }
+    caption.classList.add('is-out');
+    captionTimer = setTimeout(apply, 240);
+  }
   let current = 0, timer = null, playing = !reduceMotion.matches, requestId = 0;
   const preload = (index) => {
     if (loaded.has(index)) return loaded.get(index);
@@ -59,6 +77,7 @@
       front = incoming;
       back = outgoing;
     }
+    setCaption(index);
     current = index;
     tabs.forEach((tab, i) => {
       tab.classList.toggle('is-active', i === index);
