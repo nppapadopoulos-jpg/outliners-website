@@ -14,7 +14,7 @@
 
 **Δεδομένα:** Ονοματεπώνυμο, στοιχεία επικοινωνίας, επαγγελματικό προφίλ, προτιμήσεις εργασίας, περιεχόμενο βιογραφικού και λοιπά στοιχεία που επιλέγετε να μας κοινοποιήσετε. Παρακαλούμε μην συμπεριλαμβάνετε μη αναγκαία ευαίσθητα δεδομένα (π.χ. στοιχεία υγείας).
 
-**Διατήρηση:** Η OutLiners προτείνει περίοδο **24 ημερολογιακών μηνών** από την υποβολή για τα βιογραφικά που διατηρούνται για κατάλληλες μελλοντικές ευκαιρίες, **υπό την προϋπόθεση νομικής τεκμηρίωσης και κατάλληλης νόμιμης βάσης**. Η τελική αφετηρία, τυχόν ανανέωση, η διάκριση ανά σκοπό και οι εξαιρέσεις θα οριστικοποιηθούν πριν την ενεργοποίηση. Νωρίτερη διαγραφή πραγματοποιείται όπου προβλέπεται από τον ΓΚΠΔ.
+**Διατήρηση:** Η OutLiners προτείνει περίοδο **12 ημερολογιακών μηνών** από την υποβολή για τα βιογραφικά που διατηρούνται για κατάλληλες μελλοντικές ευκαιρίες, **υπό την προϋπόθεση νομικής τεκμηρίωσης και κατάλληλης νόμιμης βάσης**. Η τελική αφετηρία, τυχόν ανανέωση, η διάκριση ανά σκοπό και οι εξαιρέσεις θα οριστικοποιηθούν πριν την ενεργοποίηση. Νωρίτερη διαγραφή πραγματοποιείται όπου προβλέπεται από τον ΓΚΠΔ.
 
 **Πρόσβαση και αποδέκτες:** Η ανθρώπινη πρόσβαση στα αποθηκευμένα βιογραφικά θα περιορίζεται αποκλειστικά στον ιδιοκτήτη/διαχειριστή της OutLiners. Εξουσιοδοτημένοι τεχνικοί πάροχοι μπορεί να επεξεργάζονται δεδομένα ως εκτελούντες την επεξεργασία με κατάλληλες συμβάσεις. Ενδεχόμενη κοινοποίηση σε εργοδότες απαιτεί χωριστή, διαφανή τεκμηρίωση πριν πραγματοποιηθεί.
 
@@ -38,7 +38,7 @@
 
 **Data categories:** Name, contact details, career history, job preferences, CV contents and other information you choose to provide. Please avoid including unnecessary sensitive information.
 
-**Retention:** OutLiners proposes **24 calendar months** from submission for CVs retained for suitable future opportunities, **subject to a documented purpose and valid legal basis**. The exact start, renewal rules, purpose-specific differences and exceptions require approval before activation. Earlier erasure will be handled where GDPR requires it.
+**Retention:** OutLiners proposes **12 calendar months** from submission for CVs retained for suitable future opportunities, **subject to a documented purpose and valid legal basis**. The exact start, renewal rules, purpose-specific differences and exceptions require approval before activation. Earlier erasure will be handled where GDPR requires it.
 
 **Access and recipients:** Human access to stored CVs is restricted to the OutLiners owner/operator. Authorized infrastructure processors may process data under appropriate contractual safeguards. Any sharing with prospective employers requires a separately documented transparent process.
 
@@ -53,7 +53,7 @@
 ## Before any publication or activation
 - [ ] Confirm controller's registered name and address.
 - [ ] Legal review of lawful basis per purpose, future-opportunity opt-in and consent UX.
-- [ ] Approve candidate and employer-specific retention schedules; exact 24-calendar-month deletion semantics.
+- [ ] Approve candidate and employer-specific retention schedules; exact 12-calendar-month deletion semantics.
 - [ ] Confirm mailbox and processor agreements, subprocessor disclosures, international transfers.
 - [ ] Verify privacy rights handling, breach procedure, and deletion tests.
 - [ ] Replace placeholders and remove DRAFT status only after approval.
