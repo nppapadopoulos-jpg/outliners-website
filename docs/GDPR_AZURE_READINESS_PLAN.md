@@ -15,14 +15,14 @@ Decision recorded 2026-11-02: **proposed candidate CV retention = 24 months**, s
 2. Determine lawful basis separately for responding to an application, future-opportunity talent pooling, and employer hiring requests. Do not presume that a checkbox alone establishes valid consent for every processing purpose.
 3. Explain purpose, categories, recipients, storage location, retention, rights, and international transfers if any in both EN/EL privacy notices. Provide a clear, unbundled choice for future-opportunity retention if legal review requires it.
 4. Confirm data-processing agreements, EU data residency and subprocessor terms for Azure, email and any future vendors.
-5. Name authorized staff, establish least-privilege access, access reviews, incident response and DSAR procedure.
+5. **Owner decision:** only the OutLiners owner is authorized to access candidate CVs and submission records. Enforce a single named individual identity with MFA, least-privilege RBAC, audit logs and periodic access review. Azure platform/service identities may require narrowly scoped technical access; no clients, recruiters, or external collaborators receive data access. Document incident response and DSAR procedure.
 6. Confirm info@outliners.gr can receive mail; verify sender/domain DNS only with owner authorization.
 7. Assess whether a DPIA is required given actual processing scale, profiling and any special-category data inadvertently included in CVs.
 
 ## Proposed technical architecture — NO PROVISIONING AUTHORIZED
 - Existing Azure Static Web Apps **Free** hosts static public pages; forms remain preview-only.
 - Separate Azure Functions API: `/api/request-talent` and `/api/submit-cv`. Current Azure adapters are reference implementations and need live staging validation.
-- EU Azure Blob Storage account/container with anonymous access disabled; encryption at rest; managed identity with minimum required permissions; no CV links in public pages or email.
+- EU Azure Blob Storage account/container with anonymous access disabled; encryption at rest; managed identity with minimum required permissions; no CV links in public pages or email. Only the owner has human read/download/delete access; use identity-based access, MFA and audit logging. No shared credentials.
 - Outbound email notification to info@outliners.gr, containing minimal metadata only, never CV attachments.
 - No public API, storage account, Function App, communication service, or paid SKU to be provisioned without separate owner approval.
 - Before requesting approval, prepare a current-price estimate including storage transactions, Function execution and hosting, monitoring, email, and possible network egress; budget alerts are not spending caps.
