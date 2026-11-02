@@ -26,6 +26,7 @@ export function loadConfig(env = process.env) {
     // period is an OWNER/LEGAL DECISION. While unset, records are stored
     // without a deleteAfter date and the purge tool refuses to run.
     retentionDays: env.RETENTION_DAYS ? int(env.RETENTION_DAYS, 0) : null,
+    retentionMonths: env.RETENTION_MONTHS ? int(env.RETENTION_MONTHS, 0) : null,
 
     // Local adapter settings
     storageDir: env.STORAGE_DIR || new URL("../../.data/submissions/", import.meta.url).pathname,
@@ -38,7 +39,8 @@ export function loadConfig(env = process.env) {
 export function assertProductionConfig(cfg) {
   const problems = [];
   if (cfg.ipHashSalt === "dev-only-salt") problems.push("IP_HASH_SALT must be set");
-  if (cfg.retentionDays === null) problems.push("RETENTION_DAYS must be decided by the owner and set");
+  if (cfg.retentionDays === null && cfg.retentionMonths === null) problems.push("RETENTION_MONTHS or RETENTION_DAYS must be set");
+  if (cfg.retentionMonths !== null && (!Number.isInteger(cfg.retentionMonths) || cfg.retentionMonths < 1)) problems.push("RETENTION_MONTHS must be positive");
   if (problems.length) throw new Error("Unsafe production configuration: " + problems.join("; "));
 }
 
