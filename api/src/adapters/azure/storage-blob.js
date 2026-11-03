@@ -32,14 +32,16 @@ export function createBlobStorage(env) {
       const month = record.receivedAt.slice(0, 7);
       const base = `submissions/${form}/${month}/${id}`;
       const c = await container();
-      await c.getBlockBlobClient(`${base}/submission.json`).upload(
-        JSON.stringify(record, null, 2), Buffer.byteLength(JSON.stringify(record, null, 2)),
-        { blobHTTPHeaders: { blobContentType: "application/json" } });
+      // Commit metadata last so partial uploads are not treated as submissions.
       if (file) {
         await c.getBlockBlobClient(`${base}/${file.storedName}`).uploadData(file.content, {
           blobHTTPHeaders: { blobContentType: "application/octet-stream" },
         });
       }
+      const payload = JSON.stringify(record, null, 2);
+      await c.getBlockBlobClient(`${base}/submission.json`).upload(
+        payload, Buffer.byteLength(payload),
+        { blobHTTPHeaders: { blobContentType: "application/json" } });
       return base;
     },
 
