@@ -65,16 +65,26 @@
     const id = document.getElementById('submission').value.trim();
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) { say('Χρειάζεται έγκυρος κωδικός υποβολής.'); return; }
     getCv.disabled = true;
+    let tokenReady = false;
+    let apiStatus = null;
     try {
       const result = await client.acquireTokenSilent(request());
+      tokenReady = true;
       const response = await fetch(`/api/owner/cv/${id}`, { headers: { Authorization: `Bearer ${result.accessToken}` }, cache: 'no-store', credentials: 'omit', redirect: 'error' });
+      apiStatus = response.status;
       if (!response.ok) throw new Error();
       const objectUrl = URL.createObjectURL(await response.blob());
       const link = document.createElement('a');
       link.href = objectUrl; link.download = 'candidate-cv'; link.click();
       setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
       say('Το CV λήφθηκε μέσω του ιδιωτικού Owner API.');
-    } catch { say('Η λήψη απορρίφθηκε ή το CV δεν είναι διαθέσιμο. Για ληγμένη συνεδρία, συνδέσου ξανά.'); }
+    } catch {
+      // Only fixed messages and the HTTP outcome; no provider error or token.
+      if (!tokenReady || apiStatus === 401) say('Χρειάζεται νέα σύνδεση Microsoft με MFA πριν από τη λήψη.');
+      else if (apiStatus === 404) say('Το CV δεν βρέθηκε ή έχει λήξει η περίοδος διατήρησής του.');
+      else if (apiStatus === 503) say('Η ιδιωτική αποθήκευση δεν είναι προσωρινά διαθέσιμη. Δοκίμασε ξανά αργότερα.');
+      else say('Η λήψη δεν ολοκληρώθηκε. Δοκίμασε ξανά αργότερα.');
+    }
     finally { getCv.disabled = !account; }
   });
 })();
