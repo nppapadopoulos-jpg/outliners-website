@@ -18,7 +18,7 @@ const env = { OWNER_TENANT_ID: tenant, OWNER_OBJECT_ID: owner, OWNER_TOKEN_AUDIE
 const key = await generateKeyPair('RS256');
 const issuer = `https://login.microsoftonline.com/${tenant}/v2.0`;
 async function token(changes = {}, signingKey = key.privateKey) {
-  return new SignJWT({ tid: tenant, oid: owner, azp:client, amr: ['pwd', 'mfa'], scp: 'CV.Read', ...changes })
+  return new SignJWT({ ver: '2.0', tid: tenant, oid: owner, azp:client, amr: ['pwd', 'mfa'], scp: 'CV.Read', ...changes })
     .setProtectedHeader({ alg: 'RS256' }).setIssuer(changes.iss || issuer).setAudience(changes.aud || 'test-api')
     .setIssuedAt().setExpirationTime(changes.exp ?? '5m').sign(signingKey);
 }
@@ -26,7 +26,7 @@ const req = value => new Request('https://unit.invalid', { headers: { authorizat
 test('signed owner token requires issuer, audience, tenant, delegated scope and MFA', async () => {
   const auth = createOwnerAuthenticator(env, { keys: key.publicKey });
   assert.equal(await auth(req(await token())), owner);
-  for (const claims of [{ oid: 'other' }, { tid: 'other' }, { azp:'other' }, { amr: ['pwd'] }, { amr: undefined }, { scp: '' }, { idtyp: 'app' }, { aud: 'another-api' }, { iss: 'https://evil.invalid' }, { exp: 1 }]) {
+  for (const claims of [{ oid: 'other' }, { tid: 'other' }, { azp:'other' }, { azp: undefined, appid: client }, { ver: '1.0' }, { ver: undefined }, { amr: ['pwd'] }, { amr: undefined }, { amr: 'mfa' }, { scp: '' }, { idtyp: 'app' }, { aud: 'another-api' }, { iss: 'https://evil.invalid' }, { exp: 1 }]) {
     assert.equal(await auth(req(await token(claims))), null, JSON.stringify(claims));
   }
   const forged = await generateKeyPair('RS256');

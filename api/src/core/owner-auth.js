@@ -16,12 +16,12 @@ export function createOwnerAuthenticator(env, { verify, keys } = {}) {
       const { jwtVerify, createRemoteJWKSet } = await import('jose');
       remoteKeys ||= keys || createRemoteJWKSet(new URL(`https://login.microsoftonline.com/${tenant}/discovery/v2.0/keys`));
       const { payload } = await (verify || jwtVerify)(authorization.slice(7), remoteKeys, {
-        issuer: [`https://login.microsoftonline.com/${tenant}/v2.0`, `https://sts.windows.net/${tenant}/`],
-        audience, algorithms: ['RS256'], requiredClaims: ['exp', 'iat', 'oid', 'tid', 'scp'],
+        issuer: `https://login.microsoftonline.com/${tenant}/v2.0`,
+        audience, algorithms: ['RS256'], requiredClaims: ['exp', 'iat', 'oid', 'tid', 'scp', 'ver', 'azp'],
         clockTolerance: 5,
       });
-      if (payload.tid !== tenant || payload.oid !== owner || payload.idtyp === 'app') return null;
-      if ((payload.azp || payload.appid) !== client) return null;
+      if (payload.ver !== '2.0' || payload.tid !== tenant || payload.oid !== owner || payload.idtyp === 'app') return null;
+      if (payload.azp !== client) return null;
       if (!String(payload.scp || '').split(' ').includes('CV.Read')) return null;
       // A password-only login, ID token, app token or missing MFA evidence fails closed.
       if (!Array.isArray(payload.amr) || !payload.amr.includes('mfa')) return null;

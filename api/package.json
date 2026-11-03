@@ -3,13 +3,18 @@
   "private": true,
   "type": "module",
   "main": "azure/src/index.js",
-  "engines": { "node": ">=22" },
-  "scripts": { "test": "node --test tests/*.test.mjs" },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "dependencies": {
-    "@azure/functions": "^4.6.0",
-    "@azure/storage-blob": "^12.26.0",
     "@azure/communication-email": "^1.0.0",
+    "@azure/functions": "^4.6.0",
     "@azure/identity": "^4.5.0",
+    "@azure/msal-browser": "5.27.0",
+    "@azure/storage-blob": "^12.26.0",
     "jose": "^6.1.0"
   }
 }
