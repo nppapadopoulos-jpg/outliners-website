@@ -66,6 +66,16 @@ export function createBlobStorage(env) {
       return null;
     },
 
+    async *list() {
+      const c = await container();
+      for await (const blob of c.listBlobsFlat({ prefix: "submissions/" })) {
+        if (!blob.name.endsWith("/submission.json")) continue;
+        const relPath = blob.name.slice(0, -"/submission.json".length);
+        const raw = await c.getBlockBlobClient(blob.name).downloadToBuffer();
+        yield { relPath, record: JSON.parse(raw.toString("utf8")) };
+      }
+    },
+
     // Data-subject deletion: remove every blob under the submission prefix.
     async deleteSubmission(relPath) {
       const c = await container();
