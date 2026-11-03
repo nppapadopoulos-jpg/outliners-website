@@ -123,11 +123,13 @@ two `Bounced` events, `SmtpStatusCode=550`, `EnhancedSmtpStatusCode=5.1.1`,
 delivery success. No Event Grid, paid diagnostic sink or extra monitoring
 resource was created to obtain this evidence.
 
-The recipient mailbox/address must be validated by its mail administrator before
-another test. Check that `info@outliners.gr` exists, is enabled, and accepts
-external mail; correct the mailbox or alias within its current mail provider.
-Do not change public DNS, change recipient, or buy a mail service automatically.
-`ENABLE_EMAIL_NOTIFICATIONS=false` is the final safe state pending that fix.
+The Owner confirms that `info@outliners.gr` is an active Microsoft 365 / Exchange
+Online recipient in tenant ATCOM, separate from the OUTLINERS Azure tenant.
+SMTP 550 / 5.1.1 alone does NOT establish that this recipient is absent. The
+rejection origin and exact cause remain unconfirmed. No further test sends are
+authorized until that cause is established. `ENABLE_EMAIL_NOTIFICATIONS=false`
+remains the safe state. No mailbox, tenant, recipient, DNS or policy change has
+been made or approved as a correction.
 The two synthetic records and their test report are removed; temporary
 maintenance code/settings are removed from the final clean deployment.
 The aggregate monthly counter remains conservative; it was not reset to bypass
@@ -150,3 +152,76 @@ controls. A saved `succeeded` state remains terminal across redeployment.
 - https://learn.microsoft.com/azure/communication-services/concepts/service-limits
 - https://learn.microsoft.com/rest/api/communication/repeatable-requests
 - https://learn.microsoft.com/samples/azure-samples/communication-services-dotnet-quickstarts/email-sample-send-email-with-managed-identity/
+
+
+## Read-only follow-up diagnosis, 2026-11-03
+
+ACS diagnostic-settings list is empty and there are zero Event Grid delivery
+subscriptions. Both existing operation GETs return `Succeeded`, `error:null`.
+The historical full SMTP diagnostic sentence was not captured in an accessible
+sink and cannot be recovered from these operation responses or aggregate
+metrics. Enabling a sink now would not backfill these events; none was enabled.
+
+Current public MX records were read only:
+
+| Priority | Host |
+| --- | --- |
+| 0 | `mxa-00913401.gslb.pphosted.com` |
+| 0 | `mxb-00913401.gslb.pphosted.com` |
+| 100 | `outliners-gr.mail.protection.outlook.com` |
+
+This indicates a preferred Proofpoint gateway before Exchange Online in the
+normal inbound path. It does not prove which host emitted these particular
+rejections. No direct-to-Exchange bypass, SMTP probe or new send was attempted.
+
+The existing EAC session identifies ATCOM SA. and shows only the signed-in
+user's self-service account/groups/settings controls. The Message Trace URL
+redirects to that self-service home; Mail flow, Recipients, rules and protection
+administration are not available. Recipient type, restrictions, matched rules
+and sender block state therefore remain unverified. No role was assigned or
+new consent requested to work around this boundary.
+
+### Exact search parameters for ATCOM's existing authorized administrator
+
+- Sender: `donotreply@2a5f6b0c-9544-421c-9751-1a732e76df60.azurecomm.net`.
+- Recipient: `info@outliners.gr`.
+- Search window: 2026-11-03 21:05–21:20 UTC (23:05–23:20 Europe/Athens).
+- ACS metrics show two SendMail/202 events in the 21:12 UTC minute bucket,
+  with one bounce in each of the 21:13 and 21:14 buckets. These are metric
+  buckets, not exact per-message SMTP timestamps.
+- CV reference: `f2a0815c-70ce-4a7b-9eb3-5561498e6421`;
+  ACS operation `17815e3a-45a3-4d33-817f-1b7e24d09ff9`.
+- Hiring reference: `e92481d2-665c-47c4-b8a2-52c2e940d217`;
+  ACS operation `36d62ac3-9e6d-454b-bf68-fab8220d31e2`.
+- Do not assume an ACS operation UUID equals the RFC Internet Message-ID.
+  Search by sender, recipient, time and the synthetic subject references first.
+
+Read-only Exchange Online PowerShell equivalents (an existing authorized admin,
+EXO module >=3.7; not executed with the limited current account):
+
+```powershell
+Get-EXORecipient -Identity 'info@outliners.gr' -Properties EmailAddresses |
+  Select-Object RecipientTypeDetails, PrimarySmtpAddress, EmailAddresses
+
+$trace = Get-MessageTraceV2 `
+  -StartDate ([datetime]'2026-11-03T21:05:00Z') `
+  -EndDate ([datetime]'2026-11-03T21:20:00Z') `
+  -SenderAddress 'donotreply@2a5f6b0c-9544-421c-9751-1a732e76df60.azurecomm.net' `
+  -RecipientAddress 'info@outliners.gr'
+$trace | Select-Object Received, Status, Subject, MessageId, MessageTraceId
+$trace | Get-MessageTraceDetailV2
+```
+
+The administrator should retrieve the full non-sensitive reject reason and
+rejecting host from Proofpoint logs, and correlate any Exchange trace. Inspect
+only this recipient's recipient-validation/route entry, external-sender and
+moderation restrictions, and any actually matched transport/anti-spam rule.
+An empty Exchange trace alone does not prove Proofpoint emitted the rejection:
+pre-acceptance Exchange connection filtering can also be absent from trace.
+
+No configuration change is justified yet. If gateway evidence establishes a
+stale recipient-validation record, the smallest candidate fix is correcting or
+resynchronizing only that recipient's gateway entry, preserving the mailbox,
+DNS and all general security policies. If a specific rule is responsible,
+prepare the exact narrowly scoped change for Owner approval first. Do not
+whitelist all azurecomm.net senders, bypass Proofpoint or relax tenant policies.

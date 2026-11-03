@@ -52,7 +52,8 @@ No merge was performed. The existing Free SWA remains in the ATCOM subscription.
   authenticated download subsequently returned 404. See [Owner access](OWNER_ACCESS.md).
 - `ENABLE_EMAIL_NOTIFICATIONS=false`; ACS Managed Identity sending was tested,
   but both real synthetic emails hard-bounced with SMTP 550 / 5.1.1.
-  Fix the existing recipient mailbox/address before another delivery test.
+  Diagnose the gateway/Exchange rejection before another delivery test;
+  SMTP 5.1.1 does not establish that the active ATCOM recipient is absent.
 - `ENABLE_RETENTION_TIMER=true`, `RETENTION_MONTHS=12` configured.
 - Existing lifecycle rule `submissions-retention-365-days` was disabled; fixed
   365-day age is not an exact twelve-calendar-month retention policy.
@@ -130,7 +131,9 @@ yet; the USD 8–9 figure remains an estimate.
    signed-token suite; no new identity licence was purchased.
 2. Approved ACS resources and a verified Azure-managed sender now exist.
    Actual Managed Identity POST/poll succeeded, but both synthetic emails
-   hard-bounced (SMTP 550 / 5.1.1). Recipient mailbox correction is required;
+   hard-bounced (SMTP 550 / 5.1.1). The exact rejecting hop/cause is unconfirmed;
+   primary MX points to Proofpoint before Exchange, and current EAC access is
+   self-service only. Existing ATCOM administrator trace/gateway logs are required;
    email dispatch is paused. No DNS change or new mail service is authorized.
 3. Durable sidecars, global lease, ETags, backoff, bounded retries and a monthly
    send cap are implemented and tested across restart. Ambiguous operations
