@@ -80,6 +80,7 @@ export function createBlobStorage(env) {
 
     // Data-subject deletion: remove every blob under the submission prefix.
     async deleteSubmission(relPath) {
+      if (typeof relPath !== "string" || !/^submissions\/(request-talent|submit-cv)\/\d{4}-\d{2}\/[0-9a-f-]{36}$/i.test(relPath)) throw new Error("Invalid submission path");
       const c = await container();
       for await (const blob of c.listBlobsFlat({ prefix: relPath + "/" })) {
         await c.deleteBlob(blob.name);
