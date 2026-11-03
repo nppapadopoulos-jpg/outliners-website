@@ -1,4 +1,4 @@
-# Azure Function App skeleton (NOT deployed, NOT tested against live Azure)
+# Azure Functions backend — staging deployed, public intake disabled
 
 See [current status and deployment gates](../../docs/AZURE_BACKEND_STATUS.md).
 Deploy the complete staged `api` package, including shared source and the root

@@ -1,5 +1,5 @@
-// Azure Functions v4 entry point — REFERENCE IMPLEMENTATION (untested against
-// live Azure; no resources or credentials exist in this project yet).
+// Azure Functions v4 entry point. Deployed with both public intake gates closed.
+// See docs/AZURE_BACKEND_STATUS.md for actual Azure verification and open gates.
 // The Functions HttpRequest implements the fetch Request surface the core
 // expects, so the shared handler is used unchanged.
 

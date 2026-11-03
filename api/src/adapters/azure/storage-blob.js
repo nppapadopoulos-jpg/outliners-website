@@ -1,7 +1,6 @@
-// Azure Blob Storage adapter — REFERENCE IMPLEMENTATION.
-// Honest status: written against @azure/storage-blob v12 APIs but NOT
-// executed anywhere in this repository (no Azure resources or credentials
-// exist, by design). Validate in staging before production use.
+// Azure Blob Storage adapter. Verified with synthetic data in Azure using
+// Managed Identity and a Blob Private Endpoint. Public intake remains closed.
+// See docs/AZURE_BACKEND_STATUS.md for the exact checks and remaining gates.
 //
 // Storage model (mirrors the tested local adapter):
 //   <container>/submissions/<form>/<yyyy-mm>/<id>/submission.json

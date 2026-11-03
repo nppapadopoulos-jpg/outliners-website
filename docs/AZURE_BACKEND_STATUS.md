@@ -1,131 +1,147 @@
-# OutLiners private backend — verified state and deployment gates
+# OutLiners private backend — verified deployment and remaining gates
 
-## Observed in Azure, 2026-11-03
+## Approved Azure deployment, 2026-11-03
 
-- OUTLINERS directory, personal Microsoft sign-in with MFA. Active subscription
-  `8dc62205-4b91-4b6f-aede-40bc8ba1d217`; subscription IAM showed only Nikos as Owner.
-- All-resources inventory in that subscription: **one resource**, storage account
-  `stoutlinerscv8dc62205`, resource group `rg-outliners-backend`, North Europe,
-  Standard StorageV2 / Hot / LRS. No Function App, ACS Email or private endpoint.
-- Storage creation succeeded. `submissions` exists and is Private. Anonymous
-  blob access, Shared Key authorization, public network access and cross-tenant
-  replication are disabled. HTTPS and TLS 1.2 are required. Blob/container soft
-  delete is seven days; versioning is off. These are control-plane observations,
-  **not** a successful live upload/download test. An unauthenticated container
-  listing request from the executor returned HTTP 403; no response data was printed.
-- The existing Free SWA remains in the ATCOM subscription. Its public Azure URL
-  serves both intake pages in preview mode (`data-preview="true"`), confirmed
-  through their rendered DOM. No second SWA was created or migration performed.
-- Existing Azure lifecycle rule `submissions-retention-365-days` is enabled.
-  This is **not twelve calendar months** when a leap day intervenes.
+The owner approved Functions Flex Consumption, Managed Identity, one Blob
+Private Endpoint and the internal `privatelink.blob.core.windows.net` zone at an
+estimated USD 8–9/month before tax for the previously modelled low-volume use.
+This is a usage estimate, not an Azure spending cap. Public DNS, live forms and
+GitHub merges remain outside the deployment authorization.
 
-## Code completed on this branch, not deployed
+The following resources were created/reused in OUTLINERS subscription
+`8dc62205-4b91-4b6f-aede-40bc8ba1d217`, group `rg-outliners-backend`, North Europe:
 
-- Both POST endpoints return 503 before parsing a body or constructing storage
-  or email clients unless **both** live-forms switches are explicitly approved.
-- `/api/owner/cv/{id}` validates a signed Entra delegated JWT: RS256/JWKS,
-  issuer, audience, expiry, tenant, exact Owner object ID, approved client ID,
-  `CV.Read` scope and `amr` containing `mfa`. Caller-created principal headers,
-  app-only tokens, ID tokens without delegated scope and missing MFA evidence
-  are rejected. The download endpoint is disabled by default.
-- Blob/ACS adapters support managed identity; no SAS, access key or storage URL
-  is returned to download callers. Download responses are attachments and
-  non-cacheable. Email text contains a private reference, not a download grant,
-  CV attachment or candidate field dump. Email is separately disabled by default.
-- Metadata `deleteAfter` is computed from the same `receivedAt` timestamp using
-  twelve UTC calendar months with end-of-month clamping (Feb 29 → Feb 28).
-  Expired CVs are refused even before the hourly cleanup pass.
-- Purge deletes attachments before the metadata retry marker. A per-submission
-  failure does not stop other records; a failed timer run is visible and the
-  next run retries. Corrupt metadata is skipped and emits a metadata-only alert
-  for operator investigation; it is never silently interpreted as safe to delete.
-- One complete deployment unit now includes both shared `api/src` and Azure
-  entry points, with a locked dependency tree. Deploying `api/azure` alone was
-  incomplete. The packaging helper neither provisions nor deploys anything.
+| Resource | Verified configuration |
+| --- | --- |
+| `func-outliners-api-8dc62205` | Flex Consumption, Node 22, Running, 512 MB, maximum 40 instances, no Always Ready instances configured |
+| `ASP-rgoutlinersbackend-897c` | FC1 / Flex Consumption plan |
+| `func-outliners-api-8dc62205-uami` | User-assigned managed identity; host/deployment access separated from CV container access |
+| `stoutlinersrt8dc62205` | Separate Standard LRS runtime/deployment storage, Shared Key and anonymous access disabled, selected-subnet access via Storage service endpoint |
+| `stoutlinerscv8dc62205` | Existing Standard Hot LRS CV storage reused; private `submissions` container |
+| `vnet-outliners-backend` | `snet-functions` for Flex; separate non-delegated `snet-private-endpoints` |
+| `pe-outliners-cv-blob` | Exactly one Private Endpoint, Blob subresource, connection Approved |
+| `pe-outliners-cv-blob-nic` | Network interface belonging to that endpoint |
+| `privatelink.blob.core.windows.net` | Exactly one VNet link, to `vnet-outliners-backend`; link Completed, autoregistration disabled |
 
-## Actual tests vs. unperformed tests
+CV storage still has public network access Disabled, anonymous access false,
+Shared Key false, HTTPS required and TLS 1.2 minimum. Blob/container soft delete
+remains seven days and versioning remains disabled. No CV storage account was
+duplicated. No NAT Gateway, Private Resolver, extra Private Endpoint, Application
+Insights, Log Analytics or ACS Email service was created.
 
-Local tests exercise signed JWTs using synthetic RSA keys, negative authorization
-cases, both closed entry points, four EN/EL submission flows through an in-memory
-Blob SDK interface, private reads, expiry, partial deletion/retry, rollback and
-ACS success/failure/disabled behavior. Local HTTP tests also exercise multipart
-validation. No real CVs, credentials or Azure tokens are test fixtures.
+The initial portal deployment hit a subnet/storage dependency race. The same
+resources were reused with an explicit dependency on the subnet deployment;
+the corrected Azure deployment succeeded. No paid plan upgrade was used.
 
-These tests do **not** establish that Azure networking, runtime triggers, managed
-identity RBAC, real Microsoft token issuance/MFA or real email delivery work.
-Those remain staging gates. A Node import of the staged Azure package verifies
-module resolution only; it does not run the Azure Functions host.
+## Deployed code and gates
 
-## Next deployment — explicit cost approval required
+Backend package from PR #11 commit
+`25ea0dd94d39352e1215bbb99949b97db3c4d79e` was staged with
+`api/tools/package-azure.mjs`, installed from its lockfile and deployed through
+Azure CLI. The package includes `api/src` and `api/azure`, not `api/azure` alone.
+Both Azure CLI deployment health checks and actual HTTP responses were checked.
+No merge was performed. The existing Free SWA remains in the ATCOM subscription.
 
-1. Re-check inventory before provisioning; reuse the existing account/container.
-2. Approve an Azure Functions **Flex Consumption** app (Node 22, zero always-ready
-   instances), managed identity, and private networking to existing storage.
-   A VNet plus Blob private endpoint and internal name resolution is the proposed
-   path. Private endpoint/DNS and runtime/storage operations can incur charges;
-   no such resource has been provisioned. Public outliners.gr DNS stays unchanged.
-   Do not link a standalone backend to Free SWA through a Standard-plan upgrade.
-   Use an independent backend origin and exact allowed frontend origins instead.
-3. Host/deployment storage must be separated from `submissions`; do not grant
-   host-level Blob Data Owner or subscription-wide permissions to candidate data.
-   App data identity needs Blob Data Contributor on **only** `submissions`.
-   Owner direct data access, if required, should be Blob Data Reader scoped to
-   that container; download API access is otherwise checked by JWT.
-4. Create single-tenant API/client app registrations in OUTLINERS, expose delegated
-   `CV.Read`, configure the exact Owner/client IDs, MSAL authorization-code + PKCE
-   sign-in, and request the `amr` optional claim. Verify an actual Owner token
-   contains MFA evidence. If it does not, stop; never remove the MFA check.
-   Security defaults are not proof of MFA for every application request. Any
-   necessary Conditional Access licensing requires separate approval.
-5. Deploy with all gates false, HTTPS only, no request-body/access-token logging,
-   `FUNCTIONS_REQUEST_BODY_SIZE_LIMIT=7340032`, and exact CORS origins. Synthetic
-   tests call the core or isolated test harness; do not enable live public POSTs.
-6. Approve ACS/Email resources before creating them. An Azure-managed sender domain
-   avoids changes to public DNS; a custom outliners.gr sender requires a separate
-   DNS approval. Assign only the email-send role needed at the ACS resource.
-   Configure `NOTIFY_EMAIL=info@outliners.gr`; verify synthetic delivery before
-   enabling notifications. Outbox delivery/reconciliation is a remaining gate:
-   email failure preserves the submission, but automatic durable email retries
-   are not implemented by this change.
-7. With forms still closed, validate synthetic upload/read/MFA/unauthorized denial,
-   private-network access and failure recovery on Azure. Do not label local mocks
-   as Azure E2E. Test lifecycle with synthetic expired metadata, not by waiting a year.
-8. **Before any data intake**, replace/disable the existing 365-day lifecycle rule
-   and enable the calendar-based timer. A fixed age lifecycle rule cannot express
-   calendar months. Seven-day soft delete applies after timer deletion; physical
-   cleanup is asynchronous. Failed deletions must alert and retry. Investigate any
-   rollback-failed orphan and corrupt metadata using the private operator process.
-9. CI + staging checks, privacy/consent review, explicit go-live approval. No merge
-   to main or real public-form activation has been performed.
+- `ENABLE_LIVE_FORMS=false`; both public POST endpoints return HTTP 503 with
+  `forms-not-live` before accessing storage or email.
+- `ENABLE_OWNER_DOWNLOAD=false`: the download route exists but is intentionally
+  closed until real Entra application/client registration and MFA-token tests.
+- `ENABLE_EMAIL_NOTIFICATIONS=false`; `NOTIFY_EMAIL=info@outliners.gr` prepared.
+- `ENABLE_RETENTION_TIMER=true`, `RETENTION_MONTHS=12` configured.
+- Existing lifecycle rule `submissions-retention-365-days` was disabled; fixed
+  365-day age is not an exact twelve-calendar-month retention policy.
+- `AZURE_CLIENT_ID` selects the runtime managed identity. Its CV permission is
+  Storage Blob Data Contributor scoped to `submissions`, not the CV account.
+- An unpredictable `IP_HASH_SALT` was generated and stored in Azure app settings;
+  its value, function keys and tokens were not printed or committed.
 
-## Non-secret configuration (all live gates remain false)
+The owner-download implementation verifies signed Entra delegated JWTs including
+issuer, audience, expiry, tenant, exact Owner object ID, approved client,
+`CV.Read` and `amr` containing `mfa`. This implementation has signed synthetic-token
+tests; a real successful Entra/MFA download has NOT yet been demonstrated.
 
-```text
-ENABLE_LIVE_FORMS=false
-LIVE_FORMS_APPROVAL=
-ENABLE_OWNER_DOWNLOAD=false
-ENABLE_EMAIL_NOTIFICATIONS=false
-ENABLE_RETENTION_TIMER=false
-RETENTION_MONTHS=12
-NOTIFY_EMAIL=info@outliners.gr
-STORAGE_ACCOUNT_URL=https://stoutlinerscv8dc62205.blob.core.windows.net
-STORAGE_CONTAINER=submissions
-OWNER_TENANT_ID=2e80c9c5-ca40-482a-8f9b-d73e9fa2c2bd
-OWNER_OBJECT_ID=3a34bb0e-fea4-4ef3-b2be-a3e3826db9b0
-OWNER_TOKEN_AUDIENCE=<registered-api-audience>
-OWNER_CLIENT_ID=<approved-public-client-app-id>
-ACS_ENDPOINT=<approved-resource-endpoint>
-SENDER_EMAIL=<verified-azure-managed-sender>
-FUNCTIONS_REQUEST_BODY_SIZE_LIMIT=7340032
-```
+## Tests actually executed
 
-Generate `IP_HASH_SALT` in Azure secret settings; never commit it. All app/identity
-IDs must be reverified from the intended resource before granting any access.
+### Local and Cloud Shell tests
+
+All 55 backend tests passed locally and again inside ephemeral Cloud Shell after
+installing the API dependencies. The 25-page smoke suite and GitHub CI passed for
+the code commit before deployment. These include signed-token negative cases,
+EN/EL multipart flows, rollback, expiry, deletion retry and mocked ACS delivery.
+The staged package imports successfully; importing alone is not a Functions
+host test.
+
+### Real Azure runtime and storage tests
+
+A temporary admin-key-protected diagnostic function ran inside the deployed
+Function App. It used real Managed Identity credentials and real Blob SDK calls,
+with only a generated UUID, a synthetic PDF marker and synthetic metadata.
+It did not enable either public intake endpoint and did not send email.
+
+Verified results from that live function:
+
+| Check | Result |
+| --- | --- |
+| Storage hostname resolves to private endpoint subnet address | Passed |
+| Managed Identity writes synthetic CV and metadata | Passed |
+| Private read returns exactly the original bytes | Passed |
+| Read denied after the synthetic record's expiry using an injected clock | Passed |
+| Retention dry run leaves the record intact | Passed |
+| Injected first deletion failure preserves the real metadata retry marker | Passed |
+| Retry deletes the real CV blob and metadata | Passed |
+| No active blobs remain under the synthetic submission prefix | Passed |
+
+The failure and clock were intentionally injected; they are not evidence of an
+actual Azure outage or a year of elapsed time. Real blob operations were used.
+Deletion was scoped to the one synthetic UUID; unrelated records were not deleted.
+Soft-deleted test blobs follow the existing seven-day recovery policy.
+
+Anonymous POSTs to both real intake endpoints returned 503 `forms-not-live`.
+Anonymous access to the temporary diagnostic returned 401. After testing, the
+original PR #11 package was redeployed and the diagnostic URL returned 404.
+An anonymous external CV-container listing returned 403 before deployment.
+
+The hourly `purgeExpiredSubmissions` timer was registered after a restart and
+trigger sync. The registered function list contains the two closed forms, owner
+download and retention timer; no diagnostic function remains. An actual scheduled
+hourly run has not been observed; the real deletion was exercised by the isolated
+synthetic probe.
+
+A monthly `outliners-backend-monthly` budget was created at the resource-group
+scope, EUR 8 (billing-profile currency verified), with 50/75/100 percent
+actual-spend notifications to `info@outliners.gr`. This budget is an alert only,
+not a spending cap. No current-month invoice or complete usage bill is available
+yet; the USD 8–9 figure remains an estimate.
+
+## Remaining go-live gates
+
+1. Register the single-tenant Entra API/client in OUTLINERS, expose delegated
+   `CV.Read`, configure exact approved client/audience/Owner IDs, and implement
+   MSAL authorization-code + PKCE sign-in. Demonstrate an actual Owner access
+   token carrying MFA evidence and a successful private CV download. Keep the
+   existing MFA validation; any required paid Conditional Access licence needs
+   separate approval.
+2. ACS Email resources and a verified Azure-managed sender have not been created.
+   Obtain any necessary explicit service approval, configure least-privilege
+   email-send access and verify synthetic delivery to `info@outliners.gr`.
+   No public outliners.gr DNS change is needed for an Azure-managed sender.
+3. Implement durable email retry/reconciliation; current email failures preserve
+   submissions but do not provide a durable delivery outbox.
+4. Verify scheduled retention execution and operational alerting/recovery. Purge
+   deletes metadata last for retry; corrupt metadata requires investigation.
+   Twelve UTC calendar months is the logical deletion deadline; seven-day soft
+   delete and asynchronous physical cleanup follow it.
+5. Complete abuse controls across multiple instances (current in-memory limits
+   alone are insufficient), operational cost monitoring, and production review.
+   Cost budgets alert; they do not enforce a hard maximum bill.
+6. Pass CI and obtain a separate explicit go-live decision. Do not merge or enable
+   real forms as part of this staging deployment.
 
 ## Primary documentation
 
 - https://learn.microsoft.com/azure/azure-functions/flex-consumption-plan
 - https://learn.microsoft.com/azure/azure-functions/configure-networking-how-to
+- https://learn.microsoft.com/azure/storage/common/storage-private-endpoints
+- https://learn.microsoft.com/azure/azure-functions/functions-deployment-technologies
 - https://learn.microsoft.com/entra/identity-platform/optional-claims-reference
-- https://learn.microsoft.com/entra/identity-platform/access-token-claims-reference
-- https://learn.microsoft.com/javascript/api/@azure/communication-email/emailclient
+- https://learn.microsoft.com/azure/cost-management-billing/costs/tutorial-acm-create-budgets
