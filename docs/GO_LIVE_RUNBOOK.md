@@ -70,7 +70,8 @@ not that Static Web App. Do not create a replacement.
    synthetic fixture, including actual metadata/file deletion and cleanup. These
    additions have automated adapter tests; they are not yet deployed/tested in Azure.
 5. With specific approval, connect ONLY web-domain records/custom-domain binding
-   to the existing Free SWA, preserving MX/SPF/DKIM/DMARC and ATCOM email. First read
+   to the existing Free SWA, preserving MX/SPF/DKIM/DMARC and ATCOM email. After approval, set outliners.gr as the SWA native default domain so other bound
+   domains and the generated hostname redirect to it, without a new proxy/CDN. First read
    the SWA custom-domain wizard's exact target/validation instructions; do not guess
    an apex record. Alternatively use the present IIS hosting if Owner provides its
    authorized deployment access. Public DNS remains unchanged until that decision.
@@ -100,3 +101,8 @@ operational evidence; never log tokens or candidate content. Stop Google collect
 by blanking the ID/releasing consent-disabled configuration if its setup is wrong.
 DNS rollback, if required after an approved DNS change, needs its own exact approved
 record set; no mail records are part of this plan.
+
+Primary default-domain reference (checked during preparation):
+https://learn.microsoft.com/en-us/azure/static-web-apps/custom-domain-default
+
+Current source and live verification evidence: [LAUNCH_VERIFICATION.md](LAUNCH_VERIFICATION.md).

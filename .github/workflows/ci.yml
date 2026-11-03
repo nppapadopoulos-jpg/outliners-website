@@ -61,9 +61,11 @@ jobs:
       - name: Lighthouse mobile lab audit
         run: |
           CHROME_PATH=$(node -e "console.log(require('playwright').chromium.executablePath())")
-          npx --yes lighthouse@13.6.0 http://localhost:8900/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-en.json" --only-categories=performance,accessibility,best-practices,seo
-          npx --yes lighthouse@13.6.0 http://localhost:8900/el/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-el.json" --only-categories=performance,accessibility,best-practices,seo
-          node tests/lighthouse_summary.mjs "$RUNNER_TEMP/lighthouse-en.json" "$RUNNER_TEMP/lighthouse-el.json"
+          for SAMPLE in 1 2 3; do
+            npx --yes lighthouse@13.6.0 http://localhost:8900/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-en-$SAMPLE.json" --only-categories=performance,accessibility,best-practices,seo --quiet
+            npx --yes lighthouse@13.6.0 http://localhost:8900/el/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-el-$SAMPLE.json" --only-categories=performance,accessibility,best-practices,seo --quiet
+          done
+          node tests/lighthouse_summary.mjs "$RUNNER_TEMP"/lighthouse-*.json
       - uses: actions/upload-artifact@v4
         with:
           name: lighthouse-lab-results
