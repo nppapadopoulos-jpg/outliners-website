@@ -46,8 +46,12 @@ Subsequently, Owner-console code commit
 `e446a34114bbeeaac2f6ca3995903f1a8cefa90f` was deployed to the same Function App
 with both access gates verified disabled. It adds same-origin MSAL/PKCE assets,
 a redirect bridge and stricter v2-only token validation. CI run #128 passed.
-Owner activation was rejected by automatic approval review pending action-time
-approval; no successful real Owner/MFA login or download is claimed.
+The Owner later explicitly approved test activation. The real sign-in attempt
+failed to complete during saved-account selection; no token/MFA outcome is known.
+Live anonymous/invalid-bearer requests returned 401 and storage isolation remained
+intact. Owner access was reset to false. The MSAL popup wait was extended from
+60 seconds to ten minutes for a new personal sign-in attempt; see OWNER_ACCESS.md.
+No successful real Owner/MFA login or CV download is claimed.
 
 - `ENABLE_LIVE_FORMS=false`; both public POST endpoints return HTTP 503 with
   `forms-not-live` before accessing storage or email.

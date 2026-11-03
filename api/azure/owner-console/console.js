@@ -18,7 +18,9 @@
     client = new msal.PublicClientApplication({
       auth: { clientId: config.clientId, authority: `https://login.microsoftonline.com/${config.tenantId}`, redirectUri: `${location.origin}/api/owner/callback` },
       cache: { cacheLocation: 'memoryStorage' },
-      system: { loggerOptions: { loggerCallback: () => {}, piiLoggingEnabled: false } },
+      // Allow the Owner time to finish the secure account/MFA handoff. This
+      // changes popup waiting only, never token expiry or the API's MFA checks.
+      system: { popupBridgeTimeout: 600000, loggerOptions: { loggerCallback: () => {}, piiLoggingEnabled: false } },
     });
     await client.initialize();
     login.disabled = false;
@@ -40,9 +42,15 @@
       getCv.disabled = false;
       clear.disabled = false;
       say('Επιβεβαιώθηκαν Owner και MFA. Η λήψη CV είναι διαθέσιμη.');
-    } catch {
+    } catch (error) {
       await client.clearCache();
-      say('Η πρόσβαση απορρίφθηκε ή η σύνδεση ακυρώθηκε. Απαιτείται ο σωστός Owner και έγκυρο MFA.');
+      // A fixed allowlisted category is safe; never print provider messages,
+      // error objects, tokens or claims.
+      if (['monitor_popup_timeout', 'timed_out', 'popup_bridge_timeout'].includes(error?.errorCode)) {
+        say('Έληξε ο χρόνος αναμονής της σύνδεσης Microsoft. Συνδέσου ξανά για να ολοκληρώσεις το MFA.');
+      } else {
+        say('Η πρόσβαση απορρίφθηκε ή η σύνδεση ακυρώθηκε. Απαιτείται ο σωστός Owner και έγκυρο MFA.');
+      }
     } finally { login.disabled = false; }
   });
   clear.addEventListener('click', async () => {

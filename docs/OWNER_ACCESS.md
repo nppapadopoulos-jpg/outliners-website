@@ -55,11 +55,30 @@ successful CV access; all exact-identity and MFA checks still apply in the API.
   assets also returned 200. Exact tenant/audience/client/Owner IDs are configured
   in Azure with `ENABLE_OWNER_DOWNLOAD=false`.
 - CI run #128 (`41693955532`) passed for the deployed code commit.
-- Activation was rejected by automatic approval review because enabling Owner
-  downloads creates security-sensitive access and requires action-time approval.
-  No attempt was made to bypass that restriction. Actual Owner login/token MFA
-  verification, synthetic CV download and real non-Owner/MFA-negative sign-in
-  tests are NOT completed. Unit-token tests are not real Entra sign-in evidence.
+- The Owner subsequently explicitly approved temporary activation for testing.
+  `ENABLE_OWNER_DOWNLOAD=true` was applied and the app restarted. The real console
+  opened a tenant-specific MSAL v2 authorization request using PKCE S256 and an
+  essential `amr=mfa` claims request.
+- The secure saved-account selection returned `submission_failed` after about
+  233 seconds; the popup had closed and the console denied access. No real access
+  token or MFA claim was inspected, displayed or logged. Its issuance/claims are
+  unknown. This is not evidence that Entra omitted MFA.
+- Investigation found MSAL's configured default popup bridge wait is only 60
+  seconds. A timeout is a plausible cause, not a proven provider failure. The
+  console now allows ten minutes for personal account/MFA interaction and shows
+  only a fixed safe timeout message. Token lifetimes and MFA validation are
+  unchanged. A new personal sign-in attempt is required.
+- Actual HTTP checks while the Owner gate was enabled: anonymous download 401,
+  malformed bearer 401, forged synthetic token with expired claims 401, anonymous
+  session 401; both public forms 503. The forged expired-token test does not
+  isolate expiry validation; signed unit tests cover expiry and missing MFA.
+- Azure management checks confirmed CV storage public network Disabled,
+  anonymous access false and Shared Key false. No new CV was uploaded because
+  real Owner authentication did not complete.
+- Owner access was reset to `false` and the app restarted. Successful real Owner
+  MFA-token verification and synthetic CV download remain pending. Real
+  non-Owner and validly signed Entra tokens without MFA have not been exercised;
+  equivalent claim restrictions passed the signed synthetic unit-token suite.
 - If Entra requires admin consent or personal MFA interaction, pause that step
   for the Owner. Never weaken MFA or purchase Conditional Access licences to
   get a green test. A real non-Owner account test requires a separate authorised
