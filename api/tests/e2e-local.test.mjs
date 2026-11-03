@@ -54,7 +54,8 @@ test("notifications target info@outliners.gr and expose no public file URL", asy
   assert.ok(outbox.length >= 2);
   const msg = JSON.parse(await readFile(join(process.env.EMAIL_SINK_DIR, outbox[0]), "utf8"));
   assert.equal(msg.to, "info@outliners.gr");
-  assert.ok(msg.text.includes("private storage"));
+  assert.ok(msg.text.includes("Owner console"));
+  assert.equal(msg.replyTo, undefined);
   assert.ok(!/https?:\/\/\S*\.(pdf|docx?)/i.test(msg.text), "no file URLs in notifications");
 });
 

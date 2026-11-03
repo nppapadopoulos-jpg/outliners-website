@@ -7,7 +7,7 @@ import { app } from "@azure/functions";
 import { loadConfig, assertProductionConfig } from "../../../src/core/config.js";
 import { createFormsHandler } from "../../../src/core/handler.js";
 import { createBlobStorage } from "../../../src/adapters/azure/storage-blob.js";
-import { createAcsEmail } from "../../../src/adapters/azure/acs-email.js";
+
 import { createPublicFormsEndpoint } from "../../../src/core/forms-gate.js";
 
 const handle = createPublicFormsEndpoint(process.env, () => {
@@ -16,7 +16,9 @@ const handle = createPublicFormsEndpoint(process.env, () => {
   return createFormsHandler({
     config,
     storage: createBlobStorage(process.env),
-    email: createAcsEmail(process.env),
+    // Committed metadata is the durable discovery marker. The timer creates
+    // notification state even after a crash between intake and dispatch.
+    email: { send: async () => ({ delivered: false, queued: true }) },
   });
 });
 

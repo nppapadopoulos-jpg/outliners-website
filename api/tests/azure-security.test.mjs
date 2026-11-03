@@ -172,13 +172,12 @@ test('a storage failure does not suppress a genuine retry as an already-stored d
   assert.equal(attempts,2);
 });
 
-test('ACS adapter stays disabled by default and verifies provider success when explicitly enabled', async () => {
-  let calls = 0;
-  const client = {async beginSend(message) {calls++; assert.equal(message.recipients.to[0].address,'info@outliners.gr'); return {async pollUntilDone(){return {status:'Succeeded',id:'synthetic'};}};}};
-  const message = {to:'info@outliners.gr',from:'synthetic@example.com',subject:'synthetic',text:'synthetic'};
-  assert.equal((await createAcsEmail({}, {client}).send(message)).disabled,true);
-  assert.equal(calls,0);
-  assert.equal((await createAcsEmail({ENABLE_EMAIL_NOTIFICATIONS:'true'}, {client}).send(message)).delivered,true);
-  const failed = {async beginSend(){return {async pollUntilDone(){return {status:'Failed'};}};}};
-  await assert.rejects(createAcsEmail({ENABLE_EMAIL_NOTIFICATIONS:'true'}, {client:failed}).send(message));
+test('ACS transport uses Managed Identity, fixed recipient and durable operation identity', async () => {
+  let calls=0;
+  const state={id:'31c5d68c-3cfa-468b-8b98-87bda4f3ba2f',form:'submit-cv',operationId:'34e06c20-f9b2-4005-8caa-36913d539b84',firstSent:Date.now()};
+  const credential={async getToken(scope){assert.equal(scope,'https://communication.azure.com/.default');return {token:'synthetic-test-token'};}};
+  const fetch=async (url,opts)=>{calls++;const msg=JSON.parse(opts.body);assert.equal(msg.recipients.to[0].address,'info@outliners.gr');assert.equal(msg.replyTo,undefined);assert.equal(msg.attachments,undefined);assert.equal(opts.headers['Operation-Id'],state.operationId);assert.equal(opts.headers['Repeatability-Request-Id'],state.operationId);return new Response(JSON.stringify({status:'Running'}),{status:202});};
+  const env={ACS_ENDPOINT:'https://synthetic.communication.azure.com',SENDER_EMAIL:'donotreply@synthetic.azurecomm.net'};
+  assert.equal((await createAcsEmail(env,{credential,fetch}).submit(state)).disabled,true);assert.equal(calls,0);
+  const result=await createAcsEmail({...env,ENABLE_EMAIL_NOTIFICATIONS:'true'},{credential,fetch}).submit(state);assert.equal(result.http,202);assert.equal(result.status,'Running');assert.equal(calls,1);
 });

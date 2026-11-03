@@ -12,7 +12,8 @@ test("valid request-talent (EN) is accepted, stored and notified", async () => {
   assert.equal(stored.length, 1);
   assert.equal(sent.length, 1);
   assert.equal(sent[0].to, "info@outliners.gr");
-  assert.equal(sent[0].replyTo, "person@example.com");
+  assert.equal(sent[0].replyTo, undefined);
+  assert.ok(!JSON.stringify(sent[0]).includes("person@example.com"));
 });
 
 test("valid submit-cv (EL) is accepted with its file", async () => {
