@@ -133,6 +133,35 @@ test('metadata upload failure rolls back uncommitted CV', async () => {
   assert.equal(c.blobs.size, 0);
 });
 
+test('a 409 or 412 on duplicate CV upload never deletes an existing committed file', async () => {
+  for (const statusCode of [409, 412]) {
+    const id = 'b07d94a5-4d3f-432d-90a3-324980984e15';
+    let deletes = 0;
+    const containerClient = {
+      getBlockBlobClient() { return { async uploadData() { throw Object.assign(new Error('synthetic conflict'), { statusCode }); } }; },
+      async deleteBlob() { deletes++; },
+    };
+    const storage = createBlobStorage(storageEnv, { containerClient });
+    await assert.rejects(storage.store({ id, form: 'submit-cv', record: { id, form: 'submit-cv', receivedAt: '2026-01-01T00:00:00Z', file: { name: 'cv.pdf' } }, file: { storedName: 'cv.pdf', content: Buffer.from('synthetic') } }));
+    assert.equal(deletes, 0);
+  }
+});
+
+test('a metadata conflict preserves a just-created CV referenced by an existing record', async () => {
+  const c = fakeContainer(), id = 'b07d94a5-4d3f-432d-90a3-324980984e15';
+  const base = `submissions/submit-cv/2026-01/${id}`;
+  const original = c.getBlockBlobClient;
+  c.getBlockBlobClient = name => {
+    const client = original(name);
+    if (name.endsWith('/submission.json')) client.upload = async () => { throw Object.assign(new Error('synthetic existing metadata'), { statusCode: 409 }); };
+    return client;
+  };
+  const storage = createBlobStorage(storageEnv, { containerClient: c });
+  await assert.rejects(storage.store({ id, form: 'submit-cv', record: { id, form: 'submit-cv', receivedAt: '2026-01-01T00:00:00Z', file: { name: 'cv.pdf' } }, file: { storedName: 'cv.pdf', content: Buffer.from('synthetic') } }));
+  assert.ok(c.blobs.has(`${base}/cv.pdf`));
+  assert.equal(c.deletes.length, 0);
+});
+
 test('a storage failure does not suppress a genuine retry as an already-stored duplicate', async () => {
   let attempts=0;
   const handle=createFormsHandler({config:testConfig(),storage:{async store(){if (++attempts===1) throw new Error('synthetic'); return 'private';}},email:{async send(){return {delivered:false};}},logger:{info(){},warn(){},error(){}}});

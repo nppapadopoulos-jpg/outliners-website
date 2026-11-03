@@ -36,11 +36,13 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
       const base = `submissions/${form}/${month}/${id}`;
       const c = await container();
       // Commit metadata last so partial uploads are not treated as submissions.
+      let fileCreated = false;
       try {
       if (file) {
         await c.getBlockBlobClient(`${base}/${file.storedName}`).uploadData(file.content, {
           blobHTTPHeaders: { blobContentType: "application/octet-stream" }, conditions: { ifNoneMatch: '*' },
         });
+        fileCreated = true;
       }
       const payload = JSON.stringify(record, null, 2);
       await c.getBlockBlobClient(`${base}/submission.json`).upload(
@@ -48,8 +50,10 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
         { blobHTTPHeaders: { blobContentType: "application/json" }, conditions: { ifNoneMatch: '*' } });
       } catch (error) {
         // An uncommitted file must not be left indefinitely without metadata.
-        // Do not delete on a precondition failure: that could be an existing record.
-        if (file && error.statusCode !== 412) {
+        // Never roll back a file whose conditional upload failed. Azure can
+        // report an existing blob as 409 as well as 412; neither conflict may
+        // remove an existing CV or a file referenced by committed metadata.
+        if (fileCreated && ![409, 412].includes(error.statusCode)) {
           try { await c.deleteBlob(`${base}/${file.storedName}`); }
           catch { audit({ event: 'storage-rollback-failed', id }); }
         }
