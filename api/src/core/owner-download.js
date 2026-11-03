@@ -13,10 +13,12 @@ export function createOwnerDownload({ storage, ownerPrincipalId, audit = () => {
       // This branch is reachable only after exact Owner authorization. Expose
       // a fixed operational category, never SDK messages, claims or credentials.
       let reason = 'unavailable';
-      if ([401, 403].includes(error?.statusCode)) reason = 'access-denied';
-      else if (error?.statusCode === 404) reason = 'missing-file';
+      if (['CredentialUnavailableError', 'AuthenticationRequiredError', 'AuthenticationError'].includes(error?.name)) reason = 'identity';
+      else if (error?.code === 'ContainerNotFound') reason = 'container-missing';
+      else if ([401, 403].includes(error?.statusCode)) reason = 'access-denied';
+      else if (error?.code === 'BlobNotFound') reason = 'missing-file';
+      else if (error?.statusCode === 404) reason = 'resource-missing';
       else if (['ENOTFOUND', 'EAI_AGAIN', 'REQUEST_SEND_ERROR'].includes(error?.code)) reason = 'network';
-      else if (['CredentialUnavailableError', 'AuthenticationRequiredError', 'AuthenticationError'].includes(error?.name)) reason = 'identity';
       else if (error?.name === 'SyntaxError') reason = 'metadata';
       else if (error?.name === 'TypeError') reason = 'client-error';
       return new Response(null, { status: 503, headers: { 'cache-control': 'no-store', 'x-outliners-storage-failure': reason } });

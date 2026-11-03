@@ -30,3 +30,15 @@ test('storage failures disclose only an allowlisted category to the authorized O
   assert.equal(await response.text(), '');
   assert.ok(!JSON.stringify([...response.headers]).includes(secret));
 });
+
+test('identity endpoint errors are not mistaken for missing CVs', async () => {
+  const download = createOwnerDownload({ ownerPrincipalId: 'owner-1', storage: { async readSubmissionFile() { throw Object.assign(new Error('redacted'), { name: 'AuthenticationError', statusCode: 404 }); } } });
+  assert.equal((await download({ principalId: 'owner-1', submissionId: id })).headers.get('x-outliners-storage-failure'), 'identity');
+});
+
+test('missing containers are distinguished from missing blobs without exposing paths', async () => {
+  for (const [code, category] of [['ContainerNotFound', 'container-missing'], ['BlobNotFound', 'missing-file']]) {
+    const download = createOwnerDownload({ ownerPrincipalId: 'owner-1', storage: { async readSubmissionFile() { throw Object.assign(new Error('redacted'), { code, statusCode: 404 }); } } });
+    assert.equal((await download({ principalId: 'owner-1', submissionId: id })).headers.get('x-outliners-storage-failure'), category);
+  }
+});
