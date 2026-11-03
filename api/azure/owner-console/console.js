@@ -67,11 +67,13 @@
     getCv.disabled = true;
     let tokenReady = false;
     let apiStatus = null;
+    let storageFailure = null;
     try {
       const result = await client.acquireTokenSilent(request());
       tokenReady = true;
       const response = await fetch(`/api/owner/cv/${id}`, { headers: { Authorization: `Bearer ${result.accessToken}` }, cache: 'no-store', credentials: 'omit', redirect: 'error' });
       apiStatus = response.status;
+      storageFailure = response.headers.get('x-outliners-storage-failure');
       if (!response.ok) throw new Error();
       const objectUrl = URL.createObjectURL(await response.blob());
       const link = document.createElement('a');
@@ -82,7 +84,17 @@
       // Only fixed messages and the HTTP outcome; no provider error or token.
       if (!tokenReady || apiStatus === 401) say('Χρειάζεται νέα σύνδεση Microsoft με MFA πριν από τη λήψη.');
       else if (apiStatus === 404) say('Το CV δεν βρέθηκε ή έχει λήξει η περίοδος διατήρησής του.');
-      else if (apiStatus === 503) say('Η ιδιωτική αποθήκευση δεν είναι προσωρινά διαθέσιμη. Δοκίμασε ξανά αργότερα.');
+      else if (apiStatus === 503) {
+        const messages = {
+          'access-denied': 'Δεν υπάρχει η απαιτούμενη άδεια σύνδεσης με την ιδιωτική αποθήκευση.',
+          'missing-file': 'Το αρχείο του CV δεν είναι διαθέσιμο στην ιδιωτική αποθήκευση.',
+          network: 'Η ιδιωτική σύνδεση δικτύου με την αποθήκευση δεν είναι διαθέσιμη.',
+          identity: 'Η ασφαλής ταυτοποίηση της εφαρμογής στο storage δεν είναι διαθέσιμη.',
+          metadata: 'Τα στοιχεία αποθήκευσης του CV χρειάζονται έλεγχο.',
+          'client-error': 'Ο μηχανισμός ανάγνωσης του CV χρειάζεται τεχνικό έλεγχο.',
+        };
+        say(messages[storageFailure] || 'Η ιδιωτική αποθήκευση δεν είναι προσωρινά διαθέσιμη. Δοκίμασε ξανά αργότερα.');
+      }
       else say('Η λήψη δεν ολοκληρώθηκε. Δοκίμασε ξανά αργότερα.');
     }
     finally { getCv.disabled = !account; }

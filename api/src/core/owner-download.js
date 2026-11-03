@@ -9,7 +9,18 @@ export function createOwnerDownload({ storage, ownerPrincipalId, audit = () => {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(submissionId || "")) return new Response(null, { status: 400 });
     let result;
     try { result = await storage.readSubmissionFile(submissionId); }
-    catch { return new Response(null, { status: 503, headers: { 'cache-control': 'no-store' } }); }
+    catch (error) {
+      // This branch is reachable only after exact Owner authorization. Expose
+      // a fixed operational category, never SDK messages, claims or credentials.
+      let reason = 'unavailable';
+      if ([401, 403].includes(error?.statusCode)) reason = 'access-denied';
+      else if (error?.statusCode === 404) reason = 'missing-file';
+      else if (['ENOTFOUND', 'EAI_AGAIN', 'REQUEST_SEND_ERROR'].includes(error?.code)) reason = 'network';
+      else if (['CredentialUnavailableError', 'AuthenticationRequiredError', 'AuthenticationError'].includes(error?.name)) reason = 'identity';
+      else if (error?.name === 'SyntaxError') reason = 'metadata';
+      else if (error?.name === 'TypeError') reason = 'client-error';
+      return new Response(null, { status: 503, headers: { 'cache-control': 'no-store', 'x-outliners-storage-failure': reason } });
+    }
     if (!result) return new Response(null, { status: 404 });
     audit({ event: "owner-cv-download", id: submissionId });
     return new Response(result.bytes, { status: 200, headers: {

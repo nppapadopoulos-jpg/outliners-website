@@ -17,3 +17,16 @@ test("owner download validates IDs and returns non-cacheable attachment", async 
   assert.equal(response.headers.get("cache-control"), "no-store, private");
   assert.equal(await response.text(), "sample");
 });
+
+test('storage failures disclose only an allowlisted category to the authorized Owner', async () => {
+  const secret = 'must-never-appear-in-response';
+  const download = createOwnerDownload({ ownerPrincipalId: 'owner-1', storage: { async readSubmissionFile() { throw Object.assign(new Error(secret), { statusCode: 403 }); } } });
+  const denied = await download({ principalId: 'other', submissionId: id });
+  assert.equal(denied.status, 403);
+  assert.equal(denied.headers.get('x-outliners-storage-failure'), null);
+  const response = await download({ principalId: 'owner-1', submissionId: id });
+  assert.equal(response.status, 503);
+  assert.equal(response.headers.get('x-outliners-storage-failure'), 'access-denied');
+  assert.equal(await response.text(), '');
+  assert.ok(!JSON.stringify([...response.headers]).includes(secret));
+});
