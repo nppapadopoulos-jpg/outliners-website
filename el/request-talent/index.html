@@ -25,6 +25,10 @@
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/assets/css/consent.css">
+<script src="/assets/js/indexing.js" defer></script>
+<script src="/assets/js/site-config.js" defer></script>
+<script src="/assets/js/consent.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Μετάβαση στο περιεχόμενο</a>
@@ -120,12 +124,12 @@
         <input id="rt-file" name="attachment" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
         <p class="field-error" id="rt-file-error" hidden></p>
       </div>
-      <div class="field field--full consent" data-error="Παρακαλούμε επιβεβαιώστε ότι συμφωνείτε με την επεξεργασία των στοιχείων σας.">
+      <div class="field field--full consent" data-error="Παρακαλούμε επιβεβαίωσε ότι διάβασες την Πολιτική Απορρήτου.">
         <input id="rt-consent" name="consent" type="checkbox" value="yes" required aria-required="true">
-        <label for="rt-consent">Συμφωνώ με την επεξεργασία των στοιχείων αυτής της φόρμας από την OutLiners για την απάντηση στο αίτημά μου, όπως περιγράφεται στην <a href="/el/privacy-policy/">Πολιτική Απορρήτου</a>.</label>
+        <label for="rt-consent">Έχω διαβάσει την <a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> σχετικά με τη διαχείριση του αιτήματός μου.</label>
         <p class="field-error" id="rt-consent-error" hidden></p>
       </div>
-      <p class="legal-note">Η διατύπωση της συγκατάθεσης είναι προσχέδιο και εκκρεμεί νομικός έλεγχος πριν από τη δημοσίευση.</p>
+      <p class="legal-note">Χρησιμοποιούμε τα στοιχεία για να απαντήσουμε στο επαγγελματικό σου αίτημα.</p>
       </div>
       <div class="actions">
         <button class="btn" type="submit">Αποστολή αιτήματος <span class="arrow" aria-hidden="true">→</span></button>
@@ -180,7 +184,7 @@
     </div>
     <div class="footer-bottom">
       <span>© <span data-year>2025</span> OutLiners. Με επιφύλαξη παντός δικαιώματος.</span>
-      <span><a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> &nbsp;·&nbsp; <a href="/el/cookies/">Cookies</a></span>
+      <span><a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> &nbsp;·&nbsp; <a href="/el/cookies/">Cookies</a> &nbsp;·&nbsp; <button type="button" data-cookie-settings>Ρυθμίσεις cookies</button></span>
     </div>
   </div>
 </footer>

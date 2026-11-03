@@ -48,6 +48,7 @@ export function validFields(form, lang = "en") {
     ...common,
     phone: "+30 690 000 0000",
     specialization: "Software engineering",
+    talent_pool_consent: "yes",
     preferred_location: lang === "el" ? "Αθήνα" : "Athens",
   };
 }

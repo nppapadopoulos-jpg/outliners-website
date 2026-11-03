@@ -10,6 +10,9 @@ on:
       - "404.html"
       - "favicon.png"
       - "assets/**"
+      - "tools/build-static.mjs"
+      - "robots.txt"
+      - "sitemap.xml"
       - "about/**"
       - "contact/**"
       - "cookies/**"
@@ -37,19 +40,7 @@ jobs:
       - name: Assemble public-only staging site
         shell: bash
         run: |
-          set -euo pipefail
-          mkdir -p staging
-          cp index.html 404.html favicon.png staging/
-          cp -R assets about contact cookies el industries privacy-policy request-talent services submit-cv staging/
-          printf 'User-agent: *\nDisallow: /\n' > staging/robots.txt
-          cat > staging/staticwebapp.config.json <<'JSON'
-          {
-            "globalHeaders": {
-              "X-Robots-Tag": "noindex, nofollow, noarchive"
-            }
-          }
-          JSON
-          test -f staging/el/index.html
+          node tools/build-static.mjs staging "$GITHUB_WORKSPACE/staging"
           test ! -e staging/api
           test ! -e staging/docs
       - name: Deploy to Azure Static Web Apps (Free)

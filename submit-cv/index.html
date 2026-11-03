@@ -25,6 +25,10 @@
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/assets/css/consent.css">
+<script src="/assets/js/indexing.js" defer></script>
+<script src="/assets/js/site-config.js" defer></script>
+<script src="/assets/js/consent.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -101,16 +105,18 @@
         <p class="field-error" id="cv-intro-error" hidden></p>
       </div>
       <div class="field field--full field--file" data-error="Please attach your CV." data-error-type="Please upload a PDF or DOCX file." data-error-size="The file must be 5 MB or smaller.">
-        <label for="cv-file">CV upload <span class="hint">PDF or DOCX, max 5 MB</span></label>
+        <label for="cv-file">CV upload <span class="hint">PDF, DOC or DOCX, max 5 MB</span></label>
         <input id="cv-file" name="cv" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required aria-required="true">
         <p class="field-error" id="cv-file-error" hidden></p>
       </div>
-      <div class="field field--full consent" data-error="Please confirm you agree to the processing of your details.">
+<div class="field field--full" data-error="Enter a role or optionally choose future opportunities."><label for="cv-position">Specific role or opportunity reference <span class="hint">if applicable</span></label><input id="cv-position" name="position_reference" type="text" maxlength="200" aria-describedby="cv-position-help"><p class="hint" id="cv-position-help">Enter a role or optionally choose future opportunities.</p><p class="field-error" id="cv-position-error" hidden></p></div>
+<div class="field field--full consent" data-error=""><input id="cv-pool" name="talent_pool_consent" type="checkbox" value="yes"><label for="cv-pool">I optionally consent to my CV being retained for up to 12 calendar months for other suitable opportunities. I can withdraw at any time at info@outliners.gr.</label><p class="field-error" id="cv-pool-error" hidden></p></div>
+      <div class="field field--full consent" data-error="Please confirm you have read the Privacy Policy.">
         <input id="cv-consent" name="consent" type="checkbox" value="yes" required aria-required="true">
-        <label for="cv-consent">I agree that OutLiners may process the information submitted with this form in order to respond to my request, as described in the <a href="/privacy-policy/">Privacy Policy</a>.</label>
+        <label for="cv-consent">I have read the <a href="/privacy-policy/">Privacy Policy</a>. This acknowledgement is not consent to every purpose.</label>
         <p class="field-error" id="cv-consent-error" hidden></p>
       </div>
-      <p class="legal-note">Consent wording is a draft pending legal review before launch.</p>
+      <p class="legal-note">Future-opportunity consent is not required to apply for a specific role.</p>
       </div>
       <div class="actions">
         <button class="btn" type="submit">Submit your CV <span class="arrow" aria-hidden="true">→</span></button>
@@ -165,7 +171,7 @@
     </div>
     <div class="footer-bottom">
       <span>© <span data-year>2025</span> OutLiners. All rights reserved.</span>
-      <span><a href="/privacy-policy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="/cookies/">Cookies</a></span>
+      <span><a href="/privacy-policy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="/cookies/">Cookies</a> &nbsp;·&nbsp; <button type="button" data-cookie-settings>Cookie settings</button></span>
     </div>
   </div>
 </footer>

@@ -38,6 +38,8 @@ export const FORMS = {
       ...common,
       phone: { required: true, max: 50 },
       specialization: { required: true, max: 200 },
+      position_reference: { required: false, max: 200 },
+      talent_pool_consent: { required: false, enum: ["yes"] },
       preferred_location: { required: true, max: 200 },
       linkedin: { required: false, max: 300, validate: v => HTTPS_URL_RE.test(v) || "format" },
       introduction: { required: false, max: 1500, multiline: true },

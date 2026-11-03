@@ -5,7 +5,7 @@
  * runs so the UX can be reviewed; a valid submit only reveals the status box
  * explaining that submissions are not yet active. When the Azure Functions
  * backend (see docs/FORMS_BACKEND_CONTRACT.md) goes live, remove the
- * attribute and implement the fetch described in the contract.
+ * attribute only in an explicitly approved release.
  */
 (function () {
   "use strict";
@@ -106,6 +106,9 @@
         if (!validateControl(control) && !firstInvalid) firstInvalid = control;
       });
 
+      var position = form.querySelector('[name="position_reference"]');
+      var pool = form.querySelector('[name="talent_pool_consent"]');
+      if (position && pool && !position.value.trim() && !pool.checked) { showError(position, document.documentElement.lang === "el" ? "Συμπλήρωσε συγκεκριμένη θέση ή επίλεξε προαιρετικά μελλοντικές ευκαιρίες." : "Enter a specific role or optionally choose future opportunities."); if (!firstInvalid) firstInvalid = position; }
       var status = form.querySelector(".form-status");
       if (firstInvalid) {
         if (status) status.hidden = true;
@@ -125,11 +128,13 @@
       // branch unless an approved release explicitly sets data-preview="false".
       if (form.dataset.preview !== "false") return;
       var english = document.documentElement.lang !== "el";
+      if (form.dataset.submitting === "true") return;
+      form.dataset.submitting = "true";
       var button = form.querySelector('button[type="submit"]');
       if (button) button.disabled = true;
       var apiOrigin = "https://func-outliners-api-8dc62205-cudka7c9c7hdajdk.northeurope-01.azurewebsites.net";
       var endpoint = new URL(form.getAttribute("action"), apiOrigin);
-      if (endpoint.origin !== apiOrigin || !/^\/api\/(submit-cv|request-talent)$/.test(endpoint.pathname)) return;
+      if (endpoint.origin !== apiOrigin || !/^\/api\/(submit-cv|request-talent)$/.test(endpoint.pathname)) { form.dataset.submitting = "false"; if (button) button.disabled = false; return; }
       fetch(endpoint.href, { method: "POST", body: new FormData(form), credentials: "omit", redirect: "error" })
         .then(function (response) {
           if (!response.ok) throw { status: response.status };
@@ -137,12 +142,13 @@
         }).then(function (result) {
           if (result.ok !== true) throw {};
           if (status) { status.textContent = english ? "Thank you. Your submission has been stored securely." : "Σε ευχαριστούμε. Η υποβολή σου αποθηκεύτηκε με ασφάλεια."; status.hidden = false; status.focus(); }
+          if (window.OutlinersAnalytics) window.OutlinersAnalytics.submissionSuccess(endpoint.pathname.endsWith("submit-cv") ? "submit-cv" : "request-talent", result.id, result.duplicate);
           form.reset(); if (started) started.value = String(Date.now());
         }).catch(function (error) {
           if (status) { status.textContent = error.status === 429
             ? (english ? "Please try again later. The submission limit has been reached." : "Δοκίμασε ξανά αργότερα. Έχει συμπληρωθεί το όριο υποβολών.")
             : (english ? "Your submission could not be completed. Please check the fields and try again." : "Η υποβολή δεν ολοκληρώθηκε. Έλεγξε τα πεδία και δοκίμασε ξανά."); status.hidden = false; status.focus(); }
-        }).finally(function () { if (button) button.disabled = false; });
+        }).finally(function () { form.dataset.submitting = "false"; if (button) button.disabled = false; });
     });
   });
 })();

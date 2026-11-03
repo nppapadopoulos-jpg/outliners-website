@@ -4,7 +4,7 @@
  let client,account=null,scopes=[],items=[],selected=null,cursor=null,history=[null],page=0,busy=false,generation=0,pdfTask=null,pdf=null,pdfPage=1,pdfBytes=null,idleTimer=null,lastActivity=0;
  const objectUrls=new Set(),date=new Intl.DateTimeFormat('el-GR',{day:'2-digit',month:'short',year:'numeric',timeZone:'Europe/Athens'});
  const say=message=>{status.textContent=message;};
- const labels={full_name:'ΟΝΟΜΑΤΕΠΩΝΥΜΟ',email:'EMAIL',phone:'ΤΗΛΕΦΩΝΟ',specialization:'ΕΙΔΙΚΟΤΗΤΑ',preferred_location:'ΠΡΟΤΙΜΩΜΕΝΗ ΤΟΠΟΘΕΣΙΑ',linkedin:'LINKEDIN',introduction:'ΛΙΓΑ ΛΟΓΙΑ',company:'ΕΤΑΙΡΕΙΑ',job_title:'ΘΕΣΗ ΕΡΓΑΣΙΑΣ',location:'ΤΟΠΟΘΕΣΙΑ',employment_type:'ΤΥΠΟΣ ΣΥΝΕΡΓΑΣΙΑΣ',timeline:'ΧΡΟΝΟΔΙΑΓΡΑΜΜΑ',salary_range:'ΕΥΡΟΣ ΑΠΟΔΟΧΩΝ',job_description:'ΠΕΡΙΓΡΑΦΗ ΑΝΑΓΚΗΣ'};
+ const labels={position_reference:'ΣΥΓΚΕΚΡΙΜΕΝΗ ΕΥΚΑΙΡΙΑ',talent_pool_consent:'ΜΕΛΛΟΝΤΙΚΕΣ ΕΥΚΑΙΡΙΕΣ',full_name:'ΟΝΟΜΑΤΕΠΩΝΥΜΟ',email:'EMAIL',phone:'ΤΗΛΕΦΩΝΟ',specialization:'ΕΙΔΙΚΟΤΗΤΑ',preferred_location:'ΠΡΟΤΙΜΩΜΕΝΗ ΤΟΠΟΘΕΣΙΑ',linkedin:'LINKEDIN',introduction:'ΛΙΓΑ ΛΟΓΙΑ',company:'ΕΤΑΙΡΕΙΑ',job_title:'ΘΕΣΗ ΕΡΓΑΣΙΑΣ',location:'ΤΟΠΟΘΕΣΙΑ',employment_type:'ΤΥΠΟΣ ΣΥΝΕΡΓΑΣΙΑΣ',timeline:'ΧΡΟΝΟΔΙΑΓΡΑΜΜΑ',salary_range:'ΕΥΡΟΣ ΑΠΟΔΟΧΩΝ',job_description:'ΠΕΡΙΓΡΑΦΗ ΑΝΑΓΚΗΣ'};
  const typeName=form=>form==='submit-cv'?'Βιογραφικό':'Αίτημα πελάτη';
  function element(tag,className,value){const n=document.createElement(tag);if(className)n.className=className;if(value!==undefined)n.textContent=value;return n;}
  async function clearPdf(){const task=pdfTask;pdfTask=null;pdf=null;pdfBytes=null;$('pdf-section').hidden=true;const canvas=$('pdf-canvas');canvas.width=0;canvas.height=0;if(task)try{await task.destroy();}catch{}}
@@ -47,7 +47,7 @@
    $('detail-kind').textContent=typeName(data.form);$('detail-title').textContent=data.form==='request-talent'?(data.company||data.name):data.name;$('detail-date').textContent='Υποβλήθηκε '+date.format(new Date(data.receivedAt));
    for(const [key,label]of Object.entries(labels)){const value=data.fields[key];if(!value)continue;const dl=element('dl','detail-field'+(['introduction','job_description'].includes(key)?' wide':''));dl.append(element('dt','',label),element('dd','',value));$('detail-fields').append(dl);}
    $('detail-files').hidden=!data.hasFile;$('preview').hidden=data.fileType!=='pdf';$('file-status').textContent=data.hasFile?(data.fileType==='pdf'?'Το PDF προβάλλεται ιδιωτικά μέσα στο Dashboard.':'Για αυτόν τον τύπο αρχείου είναι διαθέσιμη ασφαλής λήψη.'):'Δεν υπάρχει συνημμένο αρχείο.';
-   $('retention').textContent='Αυτόματη διαγραφή: '+date.format(new Date(data.deleteAfter))+'. '+(data.consentRecorded?'Η συγκατάθεση έχει καταγραφεί.':'');
+   $('retention').textContent='Αυτόματη διαγραφή: '+date.format(new Date(data.deleteAfter))+'. '+(data.consentRecorded?'Η ενημέρωση απορρήτου έχει καταγραφεί.':'');
    if(data.isNew){await api('submissions/'+id+'/review',{method:'POST'});selected.isNew=false;for(const item of items)if(item.id===id)item.isNew=false;const row=$('submissions').querySelector('[data-submission-id="'+id+'"]');row?.querySelector('.new-pill')?.remove();$('count-new').textContent=Math.max(0,Number($('count-new').textContent)-1);}
   }catch(e){if(current!==generation)return;dialog.close();if(e?.status===404){say('Η υποβολή δεν είναι πλέον διαθέσιμη.');await load(true);}else await failure(e);}
  }

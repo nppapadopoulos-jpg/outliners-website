@@ -122,12 +122,19 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
     }
 
     const receivedAt = Date.now();
+    const pool = formName === "submit-cv" && fields.talent_pool_consent === "yes";
+    const maxDeadline = config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths, receivedAt) : deleteAfter(config.retentionDays, receivedAt);
+    const specificDeadline = formName === "submit-cv" && !pool ? deleteAfterMonths(3, receivedAt) : null;
+    const deadline = maxDeadline && specificDeadline ? (maxDeadline < specificDeadline ? maxDeadline : specificDeadline) : maxDeadline;
     const record = {
       id,
       form: formName,
       receivedAt: new Date(receivedAt).toISOString(),
-      deleteAfter: config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths, receivedAt) : deleteAfter(config.retentionDays, receivedAt),
-      consent: { value: "yes", recordedAt: new Date().toISOString() },
+      deleteAfter: deadline,
+      // Legacy field name retained for compatibility; this event is notice acknowledgement, not blanket consent.
+      consent: { value: "yes", purpose: "privacy-notice-acknowledgement", noticeVersion: "2026-11-04", recordedAt: new Date(receivedAt).toISOString() },
+      processing: { specificOpportunity: !!fields.position_reference, futureOpportunities: pool, specificBasis: formName === "submit-cv" && fields.position_reference ? "6(1)(f)" : null, futureBasis: pool ? "6(1)(a)" : null },
+      talentPoolConsent: formName === "submit-cv" ? { value: pool ? "yes" : "no", noticeVersion: "2026-11-04", recordedAt: new Date(receivedAt).toISOString() } : null,
       fields: Object.fromEntries(Object.entries(fields).filter(([k]) => k !== "consent")),
       file: file ? { name: file.storedName, type: file.type, bytes: file.bytes } : null,
     };
@@ -149,7 +156,7 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
     // in private storage; the failure is logged for manual follow-up.
     let notified = true;
     try {
-      const result = await email.send(buildNotification({ form: formName, id, fields, file, storagePath, config }));
+      const result = await email.send(buildNotification({ form: formName, id: acceptedId, fields, file, storagePath, config }));
       notified = result?.delivered !== false;
     } catch (err) {
       notified = false;

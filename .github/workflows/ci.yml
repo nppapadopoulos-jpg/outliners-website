@@ -15,7 +15,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run smoke tests
-        run: python3 tests/smoke_test.py
+        run: |
+          python3 tests/smoke_test.py
+          python3 tests/seo_audit.py
+          node tools/build-static.mjs staging "$RUNNER_TEMP/static-staging"
+          node tools/build-static.mjs production "$RUNNER_TEMP/static-production"
 
   backend-tests:
     name: Forms backend tests (mocked storage/email)
@@ -52,3 +56,16 @@ jobs:
         run: python3 -m http.server 8900 &
       - name: Run UI checks
         run: node tests/ui_checks.mjs
+      - name: Consent and conversion integration (synthetic, no provider sends)
+        run: node tests/consent_checks.mjs
+      - name: Lighthouse mobile lab audit
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('playwright').chromium.executablePath())")
+          npx --yes lighthouse@13.6.0 http://localhost:8900/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-en.json" --only-categories=performance,accessibility,best-practices,seo
+          npx --yes lighthouse@13.6.0 http://localhost:8900/el/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-el.json" --only-categories=performance,accessibility,best-practices,seo
+          node tests/lighthouse_summary.mjs "$RUNNER_TEMP/lighthouse-en.json" "$RUNNER_TEMP/lighthouse-el.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-lab-results
+          path: ${{ runner.temp }}/lighthouse-*.json
+          retention-days: 7
