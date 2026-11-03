@@ -1,7 +1,7 @@
 """Deterministic source SEO/publication audit, not a Google indexing guarantee."""
 from pathlib import Path
 from html.parser import HTMLParser
-import json,xml.etree.ElementTree as ET
+import json,re,xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]
 SITE='https://outliners.gr'
 class Page(HTMLParser):
@@ -23,7 +23,10 @@ class Page(HTMLParser):
 urls=set();titles=set();descs=set()
 for p in sorted(ROOT.rglob('*.html')):
  if any(x in p.relative_to(ROOT).parts for x in ['api','docs','node_modules','.git','.preview','.openai']):continue
- rel=p.relative_to(ROOT).as_posix();page=Page();source=p.read_text();page.feed(source)
+ rel=p.relative_to(ROOT).as_posix();page=Page();source=p.read_text();
+ if re.fullmatch(r'google[a-z0-9]+\.html',rel):
+  assert source.strip()=='google-site-verification: '+rel;continue
+ page.feed(source)
  if rel=='404.html':assert 'noindex' in page.meta.get('robots','');continue
  url=SITE+'/'+rel.removesuffix('index.html');urls.add(url)
  assert page.title and page.title not in titles,rel+' duplicate title';titles.add(page.title)

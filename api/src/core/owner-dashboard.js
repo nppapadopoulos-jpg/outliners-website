@@ -21,10 +21,12 @@ export function createOwnerDashboard({storage,ownerPrincipalId,cursorSecret,now=
   const clock=now();
   if(action!=='list'&&!UUID.test(id || ''))return json(400,{code:'invalid-id'});
   try{
-   if(action==='review'){
+   if(action==='review'||action==='erase'){
     if(request.method!=='POST')return json(405,{code:'method'});
     const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json(403,{code:'origin'});
+    if(action==='erase'){const raw=await request.text();if(raw.length>100)return json(400,{code:'confirmation-required'});let body;try{body=JSON.parse(raw);}catch{return json(400,{code:'confirmation-required'});}if(body?.confirm!==true||Object.keys(body).length!==1)return json(400,{code:'confirmation-required'});}
     const r=await storage.ownerRecord(id);if(!validRecord(r,clock))return json(404,{code:'not-found'});
+    if(action==='erase'){await storage.requestErasure(r,new Date(clock).toISOString());return json(200,{ok:true,erasurePending:true});}
     await storage.markReviewed(r,new Date(clock).toISOString());return json(200,{ok:true});
    }
    if(request.method!=='GET' && !(action==='list'&&request.method==='POST'))return json(405,{code:'method'});

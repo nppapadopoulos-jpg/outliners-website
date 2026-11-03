@@ -41,6 +41,10 @@ def main():
     for page in pages:
         rel = os.path.relpath(page, ROOT)
         html = open(page, encoding="utf-8").read()
+        if re.fullmatch(r'google[a-z0-9]+\.html', rel):
+            if open(page, encoding='utf-8').read().strip() != 'google-site-verification: '+rel:
+                err(f'{rel}: invalid Google verification file')
+            continue
         is_greek = rel.startswith("el/") or rel.startswith("el" + os.sep)
         is_404 = rel == "404.html"
 

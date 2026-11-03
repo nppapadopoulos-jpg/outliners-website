@@ -1,22 +1,24 @@
-# OutLiners launch gates
+# OutLiners final launch gates — 4 November 2026
 
-Current evidence and limits: [Talent Dashboard verification](TALENT_DASHBOARD.md).
+See [GO_LIVE_RUNBOOK.md](GO_LIVE_RUNBOOK.md) for release order and rollback,
+[LEGAL_PRIVACY_REVIEW.md](LEGAL_PRIVACY_REVIEW.md) for final privacy review and
+[TALENT_DASHBOARD.md](TALENT_DASHBOARD.md) for the earlier real Azure tests.
 
-## Completed
+Prepared, not published: bilingual privacy/cookies, consent-gated GA4 integration,
+24-URL SEO/canonical/sitemap, safe public bundle, purpose-specific CV retention,
+and Owner early-erasure control. Email remains paused and optional.
 
-- Actual Owner Entra/MFA, private Blob list/details/review/download and PDF preview.
-- Synthetic Azure storage workflow, pagination/search/filters.
-- Durable admission/idempotency, email failure without loss, expiry/orphan recovery.
-- 80 backend tests and full CI #152 passed for deployed functional source.
-- Forms closed, no merge, public DNS change or new paid resource.
+## Actual remaining dependencies
 
-## Final requirements
+- Owner/legal privacy sign-off, actual provider/account terms, and real Google GA4
+  Measurement ID + consented provider receipt check (test loader/API are mocked in CI).
+- Search Console account verification token/file; sitemap and URL-prefix path prepared.
+- Main domain currently serves an IIS Under Construction page, while Azure staging
+  uses the existing Free SWA. Approve the exact web-domain binding/DNS plan, or provide
+  authorized current-host deployment access. No mail/DNS change has been made.
+- Explicit approval for PR merge, coordinated backend/static deployment and real forms.
+  New purpose/early-erasure code needs its scoped synthetic Azure test after approved
+  backend deployment; it must not be claimed as deployed in the preparation report.
 
-- Complete and approve draft privacy notice with verified controller legal identity.
-- Explicit Owner approval for PR merge/static publication and real form activation.
-- At activation, verify existing public hosting/domain route and controlled public-origin submission; no DNS change authorized.
-- Owner mobile-device smoke test before relying on mobile access.
-
-Email is optional and paused. Its failure must never undo committed submissions.
-Never include CV attachments, personal details, public Blob links, SAS tokens or
-secrets in notifications.
+Source and real Azure test results are distinct. No guarantee of indexing, ranking,
+physical legal compliance or field Core Web Vitals is made by a green CI score.

@@ -15,12 +15,18 @@ export function createOwnerRepository(env,{container:injected}={}){
   try{const m=name.match(PATH),blob=cc.getBlockBlobClient(name),props=await blob.getProperties();if(props.contentLength>65536)return null;
    const r=JSON.parse((await blob.downloadToBuffer()).toString('utf8'));
    if(!m||!UUID.test(r.id || '')||r.id!==m[3]||r.form!==m[1]||r.receivedAt?.slice(0,7)!==m[2])return null;
-   const path=name.slice(0,-16);return {...r,_path:path,reviewedAt:review.get(path)||null};
+   const path=name.slice(0,-16);return {...r,_path:path,_etag:props.etag,reviewedAt:review.get(path)||null};
   }catch(e){if(e.statusCode===404||e instanceof SyntaxError)return null;throw Error('Owner record unavailable');}
  }
  return {
   async ownerRecords(){const {cc,records,review}=await manifest(),out=[];for(let i=0;i<records.length;i+=8){const batch=await Promise.all(records.slice(i,i+8).map(n=>read(n,cc,review)));out.push(...batch.filter(Boolean));}return out;},
   async ownerRecord(id){if(!UUID.test(id))return null;const {cc,records,review}=await manifest();const name=records.find(n=>n.endsWith('/'+id+'/submission.json'));return name?read(name,cc,review):null;},
+  async requestErasure(record,at){
+   if(!PATH.test(record._path+'/submission.json')||!record._etag)throw Error('Invalid erasure record');
+   const {_path,_etag,reviewedAt,...data}=record;data.deleteAfter=at;data.erasureRequestedAt=at;
+   const bytes=JSON.stringify(data);
+   await (await container()).getBlockBlobClient(_path+'/submission.json').upload(bytes,Buffer.byteLength(bytes),{conditions:{ifMatch:_etag},blobHTTPHeaders:{blobContentType:'application/json'}});
+  },
   async markReviewed(record,at){if(!PATH.test(record._path+'/submission.json'))throw Error('Invalid owner record');const data=JSON.stringify({reviewedAt:at});await (await container()).getBlockBlobClient(record._path+'/review.json').upload(data,Buffer.byteLength(data),{metadata:{reviewedat:at},blobHTTPHeaders:{blobContentType:'application/json'}});},
  };
 }

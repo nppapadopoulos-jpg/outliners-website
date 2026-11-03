@@ -43,7 +43,7 @@ Common to both forms:
 | `full_name` | text | yes | |
 | `email` | email | yes | validate format server-side |
 | `phone` | text | RT: no / CV: yes | |
-| `consent` | `"yes"` | yes | reject any submission without it; log timestamp |
+| `consent` | `"yes"` | yes | privacy-notice acknowledgement, not blanket processing consent; persist version/time privately |
 | `lang` | `"en"` or `"el"` | yes | language of the page used |
 | `website` | text | — | **honeypot**: any non-empty value ⇒ silently accept and discard (HTTP 200, no storage, no email) |
 | `form_started_at` | epoch ms | yes | **time check**: reject if `now - value < 3000` ms or value missing/not numeric |
@@ -67,6 +67,8 @@ Common to both forms:
 |---|---|---|
 | `specialization` | text | yes |
 | `preferred_location` | text | yes |
+| `position_reference` | text ≤ 200 chars | required if no future opt-in |
+| `talent_pool_consent` | `"yes"` only if deliberately checked | optional for a named role |
 | `linkedin` | URL (`https://…`) | no |
 | `introduction` | text ≤ 1500 chars | no |
 | `cv` | file | **yes** |
@@ -79,7 +81,7 @@ Common to both forms:
   extension or `Content-Type` alone.
 - Store at `submissions/{form}/{yyyy-mm}/{uuid}/{original-name-sanitized}` in the
   private container; alongside it store `submission.json` with all fields, the
-  consent timestamp, language, and receipt time (for future ATS/CRM import).
+  notice acknowledgement/version, separate pool consent/purpose, language, and receipt time (for future ATS/CRM import).
 - Do **not** log file contents; log only metadata (sizes, outcome, hashed IP).
 
 ## 5. Responses (JSON)
@@ -94,32 +96,13 @@ Common to both forms:
 
 Rate limit: suggest 5 submissions / hour / IP per endpoint.
 
-## 6. Frontend activation (when backend is live)
+## 6. Activation
 
-1. Remove `data-preview="true"` from both forms (all four pages).
-2. In `assets/js/intake.js`, replace the preview branch with:
-   `fetch(form.action, { method: "POST", body: new FormData(form) })`,
-   showing a bilingual success or failure message in the existing
-   `.form-status` box (success copy to be approved by the owner).
-3. Update `/privacy-policy/` + `/el/privacy-policy/` with the final, legally
-   reviewed text covering these forms (purpose, legal basis, retention,
-   processors, rights) **before** enabling submissions.
-4. Confirm `info@outliners.gr` exists and SPF/DKIM are set for the sending
-   domain.
+See [GO_LIVE_RUNBOOK.md](GO_LIVE_RUNBOOK.md). No activation is authorized by this contract.
+The prepared frontend requires an explicit data-preview="false" generated release;
+the Azure gate is independent. GA4 success is dispatched only for a confirmed stored
+response with an ID and not duplicate=true; no form fields or IDs enter its event payload.
 
-## 7. GDPR requirements for the backend
-
-- EU-region storage and processing only; no third-party form processors.
-- Retention: auto-delete submissions after the owner-approved period
-  (lifecycle rule on the container); period to be fixed with legal review.
-- Access to the container restricted (managed identity / RBAC); notification
-  emails carry links that require authentication, not public SAS URLs with
-  long expiry (if SAS is used, expiry ≤ 7 days and scope read-only).
-- A data-subject deletion request must be executable by deleting the
-  submission folder (one UUID = one submission).
-
-## 8. ATS/CRM readiness
-
-Each submission's `submission.json` is the integration record. A future ATS or
-CRM connector consumes new records via Event Grid (blob-created events) or a
-scheduled import — no frontend changes required.
+Specific-opportunity-only CVs expire within three calendar months; optional future
+pooling within twelve. Owner erasure moves the deadline to now and the existing
+hourly timer removes the whole prefix with retry. All four checked-in forms stay closed.

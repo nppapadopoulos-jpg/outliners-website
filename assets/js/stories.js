@@ -37,6 +37,7 @@
       const asset = new Image();
       asset.onload = () => resolve(asset);
       asset.onerror = () => resolve(null);
+      asset.fetchPriority = 'low';
       asset.src = '/assets/img/stories/' + paths[index];
     });
     loaded.set(index, promise);
@@ -113,5 +114,10 @@
   // First story is the AI developer. Use the approved meeting-room fallback until images are uploaded.
   select(0, false);
   schedule();
-  paths.forEach((_, index) => { if (index) preload(index); });
+  // Let the initial hero/font finish before prefetching the next story.
+  window.addEventListener('load', () => {
+    const next = () => preload((current + 1) % paths.length);
+    if ('requestIdleCallback' in window) window.requestIdleCallback(next, {timeout:4000});
+    else setTimeout(next,2000);
+  }, {once:true});
 })();

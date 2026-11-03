@@ -73,3 +73,20 @@ test('global monthly admission cap is shared across IPs and form types',async()=
  await make().store({id:ids[0],form:'submit-cv',record:record(),file:{storedName:'synthetic.pdf',content:Buffer.from('%PDF-1.4')},admission:{ipHash:'ip1'}});
  await assert.rejects(make().store({id:ids[1],form:'request-talent',record:{...record(ids[1],'request-talent'),fields:{email:'other@example.invalid'}},file:{storedName:'synthetic.pdf',content:Buffer.from('%PDF-1.4')},admission:{ipHash:'ip2'}}),e=>e.statusCode===429);
 });
+
+test('Owner erasure requires confirmation and exact identity, blocks file/list immediately and retries physical deletion',async()=>{
+ const c=memoryContainer(),r=record();const storage=await seed(c,r),repo=createOwnerRepository(env,{container:c});
+ const api=createOwnerDashboard({storage:repo,ownerPrincipalId:owner,cursorSecret:secret,now:()=>clock});
+ assert.equal((await api({principalId:'wrong',action:'erase',id:r.id,request:req({confirm:true})})).status,403);
+ assert.equal((await api({principalId:owner,action:'erase',id:r.id,request:req()})).status,400);
+ assert.equal((await api({principalId:owner,action:'erase',id:r.id,request:new Request('https://owner.invalid/api/owner/submissions',{method:'POST',headers:{origin:'https://wrong.invalid'},body:'{"confirm":true}'})})).status,403);
+ const stale=await repo.ownerRecord(r.id);
+ assert.equal((await api({principalId:owner,action:'erase',id:r.id,request:req({confirm:true})})).status,200);
+ const list=await(await api({principalId:owner,request:req()})).json();assert.equal(list.total,0);
+ assert.equal((await api({principalId:owner,action:'detail',id:r.id,request:req({},'GET')})).status,404);
+ await assert.rejects(()=>repo.requestErasure(stale,new Date(clock).toISOString()),e=>e.statusCode===412);
+ const current=await repo.ownerRecord(r.id);assert.equal(current.deleteAfter,new Date(clock).toISOString());
+ assert.equal(await storage.readSubmissionFile(r.id),null,'expired tombstone blocks download before physical deletion');
+ c.fail.delete=1;await assert.rejects(()=>storage.deleteSubmission(current._path));assert.ok(c.files.has(current._path+'/submission.json'));
+ await storage.deleteSubmission(current._path);assert.equal(c.files.has(current._path+'/submission.json'),false);
+});

@@ -1,9 +1,11 @@
-import {cp,mkdir,writeFile,readFile} from 'node:fs/promises';
+import {cp,mkdir,writeFile,readFile,readdir} from 'node:fs/promises';
 import path from 'node:path';
 const mode=process.argv[2]||'staging',dest=process.argv[3];
 if(!['staging','production'].includes(mode)||!dest||!path.isAbsolute(dest))throw Error('Usage: node tools/build-static.mjs staging|production /absolute/new/output');
 await mkdir(dest,{recursive:false});
 for(const name of ['index.html','404.html','favicon.png','assets','about','contact','cookies','el','industries','privacy-policy','request-talent','services','submit-cv'])await cp(name,path.join(dest,name),{recursive:true});
+// Optional exact Google URL-prefix verification file; never copy arbitrary root files.
+for(const name of await readdir('.'))if(/^google[a-z0-9]+\.html$/.test(name)){const text=(await readFile(name,'utf8')).trim();if(text!=='google-site-verification: '+name)throw Error('Unexpected verification file content');await cp(name,path.join(dest,name));}
 const host='https://func-outliners-api-8dc62205-cudka7c9c7hdajdk.northeurope-01.azurewebsites.net';
 const headers={
  'X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','X-Frame-Options':'DENY',

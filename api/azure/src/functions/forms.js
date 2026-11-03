@@ -34,13 +34,13 @@ function register(name) {
     handler: async (request, context) => {
       const origin=request.headers.get('origin');
       const allowed=(process.env.PUBLIC_FORM_ORIGINS || 'https://outliners.gr,https://www.outliners.gr').split(',');
-      if(process.env.ENABLE_LIVE_FORMS==='true' && (!origin || !allowed.includes(origin)))return {status:403,headers:{'cache-control':'no-store'}};
+      if(process.env.ENABLE_LIVE_FORMS==='true' && (!origin || !allowed.includes(origin)))return {status:403,headers:{'cache-control':'no-store','x-robots-tag':'noindex, nofollow'}};
       // App Service appends its observed peer; never trust an injected first XFF value.
       const clientIp = request.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim();
       const response = await handle(name, request, { clientIp });
       return {
         status: response.status,
-        headers: Object.fromEntries(response.headers),
+        headers: { 'x-robots-tag':'noindex, nofollow', ...Object.fromEntries(response.headers) },
         body: await response.text(),
       };
     },

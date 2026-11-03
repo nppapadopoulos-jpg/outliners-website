@@ -8,7 +8,7 @@ const {chromium}=createRequire(import.meta.url)('playwright');
 const browser=await chromium.launch();
 const root=process.cwd(),ID='G-TESTONLY01';
 const pdf=Buffer.from('%PDF-1.4\nSynthetic consent integration fixture\n');
-async function fixture({lang='en',live=false,duplicate=false,status=200,id=ID,viewport={width:390,height:844}}={}){
+async function fixture({lang='en',form='submit-cv',live=false,duplicate=false,status=200,id=ID,viewport={width:390,height:844}}={}){
  const context=await browser.newContext({viewport});let google=0,posts=0;
  await context.route('**/*',async route=>{
   const u=new URL(route.request().url());
@@ -24,7 +24,7 @@ async function fixture({lang='en',live=false,duplicate=false,status=200,id=ID,vi
    return route.fulfill({status:200,body:bytes,contentType:({'.html':'text/html','.js':'text/javascript','.css':'text/css','.woff2':'font/woff2','.webp':'image/webp','.png':'image/png'})[ext]||'application/octet-stream'});
   }catch{return route.fulfill({status:404,body:''});}
  });
- const page=await context.newPage();await page.goto('https://outliners.gr/'+(lang==='el'?'el/':'')+'submit-cv/?email=never-send@example.invalid&utm_source=linkedin&utm_medium=social&utm_campaign=never-send@example.invalid#secret');
+ const page=await context.newPage();await page.goto('https://outliners.gr/'+(lang==='el'?'el/':'')+form+'/?email=never-send@example.invalid&utm_source=linkedin&utm_medium=social&utm_campaign=never-send@example.invalid#secret');
  await page.locator('#cookie-consent').waitFor({state:'visible'});
  return {context,page,google:()=>google,posts:()=>posts};
 }
@@ -53,4 +53,10 @@ for(const options of [{lang:'el',live:false},{live:true,duplicate:true},{live:tr
  if(!options.live)assert.equal(x.posts(),0);if(options.id==='')assert.equal(x.google(),0);
  assert.equal(await x.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'mobile consent/form has no horizontal overflow');await x.context.close();
 }
+const rt=await fixture({form:'request-talent',lang:'el',live:true});
+await rt.page.locator('#cookie-consent').getByRole('button',{name:'Αποδοχή όλων',exact:true}).click();
+await rt.page.waitForFunction(()=>document.cookie.includes('_ga='));
+for(const [name,value] of Object.entries({full_name:'Synthetic Client',email:'synthetic-client@example.invalid',company:'Synthetic Company',job_title:'Synthetic Role',location:'Synthetic location',job_description:'Synthetic description only'}))await rt.page.locator('[name='+name+']').fill(value);
+await rt.page.locator('[name=employment_type]').selectOption('full-time');await rt.page.locator('[name=timeline]').selectOption('asap');await rt.page.locator('[name=consent]').check();await rt.page.locator('button[type=submit]').click();await rt.page.waitForFunction(()=>document.querySelector('form').dataset.submitting!=='true');
+const rtEvents=await rt.page.evaluate(()=>window.dataLayer.map(x=>Array.from(x)));assert.equal(rtEvents.filter(x=>x[0]==='event'&&x[1]==='request_talent_success').length,1);assert.equal(rtEvents.filter(x=>x[0]==='event'&&x[1]==='submit_cv_success').length,0);assert.ok(!JSON.stringify(rtEvents).includes('synthetic-client'));assert.equal(rt.posts(),1);await rt.context.close();
 await browser.close();console.log('PASS consent: no pre-consent traffic, reject, settings, revoke, mobile EL/EN, no PII, no duplicate/failed/preview conversions; GA loader and Azure are mocked.');

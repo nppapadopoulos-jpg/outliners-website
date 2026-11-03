@@ -99,3 +99,12 @@ traffic. Email stays optional and paused.
    smoke test is recommended before depending on mobile use.
 
 Email delivery/ATCOM migration is not a prerequisite for this workflow.
+
+## Subsequent launch preparation, 4 November 2026
+
+Owner reported successful mobile Dashboard use. The new privacy-purpose fields,
+three-month specific-role retention and early-erasure action are prepared in PR
+source, with automated tests; this does not change the deployed 76182b7 runtime
+until a separately approved backend release. See GO_LIVE_RUNBOOK.md for the
+required synthetic Azure recheck after deployment. Earlier legal-identity and
+mobile-readiness outstanding notes above are historical.

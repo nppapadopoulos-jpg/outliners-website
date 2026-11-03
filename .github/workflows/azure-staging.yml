@@ -1,49 +1,71 @@
-name: Azure staging (Free Static Web App)
+name: Azure static release (Free, manual approval)
 
+# Both staging and production writes are explicit. Merging alone must not publish.
 on:
-  push:
-    branches:
-      - feature/story-captions-email
-    paths:
-      - ".github/workflows/azure-staging.yml"
-      - "index.html"
-      - "404.html"
-      - "favicon.png"
-      - "assets/**"
-      - "tools/build-static.mjs"
-      - "robots.txt"
-      - "sitemap.xml"
-      - "about/**"
-      - "contact/**"
-      - "cookies/**"
-      - "el/**"
-      - "industries/**"
-      - "privacy-policy/**"
-      - "request-talent/**"
-      - "services/**"
-      - "submit-cv/**"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Build/deploy staging (noindex) or approved production
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      approval:
+        description: Production only - type OUTLINERS_GO_LIVE after Owner approval
+        type: string
+        default: ""
+      enable_forms:
+        description: Production only - publish the approved real forms
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: outliners-azure-staging
-  cancel-in-progress: true
+  group: outliners-existing-static-release
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Publish static preview to Azure
+    name: Publish approved static package to existing Azure SWA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble public-only staging site
-        shell: bash
+      - name: Validate explicit release inputs
+        env:
+          RELEASE_MODE: ${{ inputs.mode }}
+          RELEASE_APPROVAL: ${{ inputs.approval }}
+          RELEASE_FORMS: ${{ inputs.enable_forms }}
         run: |
-          node tools/build-static.mjs staging "$GITHUB_WORKSPACE/staging"
+          set -euo pipefail
+          case "$RELEASE_MODE" in staging|production) ;; *) exit 1 ;; esac
+          if [ "$RELEASE_MODE" = production ]; then
+            test "$RELEASE_APPROVAL" = OUTLINERS_GO_LIVE
+            node -e "const fs=require('fs'),vm=require('vm');const c={window:{}};vm.runInNewContext(fs.readFileSync('assets/js/site-config.js','utf8'),c);if(!/^G-[A-Z0-9]{6,15}$/.test(c.window.OUTLINERS_SITE_CONFIG.ga4MeasurementId))throw Error('Real approved GA4 stream ID is required before production');"
+          else
+            test "$RELEASE_FORMS" != true
+          fi
+      - name: Assemble public-only approved site
+        env:
+          RELEASE_MODE: ${{ inputs.mode }}
+          RELEASE_FORMS: ${{ inputs.enable_forms }}
+        run: |
+          node tools/build-static.mjs "$RELEASE_MODE" "$GITHUB_WORKSPACE/staging"
+          if [ "$RELEASE_FORMS" = true ]; then
+            python3 - <<'PY'
+          from pathlib import Path
+          for rel in ['submit-cv/index.html','el/submit-cv/index.html','request-talent/index.html','el/request-talent/index.html']:
+              p=Path('staging')/rel
+              text=p.read_text().replace('data-preview="true"','data-preview="false"')
+              import re
+              text=re.sub(r'<p class="preview-badge"[^>]*>.*?</p>','',text)
+              p.write_text(text)
+          PY
+          fi
           test ! -e staging/api
           test ! -e staging/docs
-      - name: Deploy to Azure Static Web Apps (Free)
+      - name: Deploy to existing Azure Static Web App (Free)
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}

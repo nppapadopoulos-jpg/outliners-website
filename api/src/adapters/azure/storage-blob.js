@@ -157,6 +157,5 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
   };
 }
 
-// Retention in Azure is enforced by a Blob lifecycle management rule
-// (delete blobs under submissions/ older than RETENTION_DAYS), configured on
-// the storage account at deploy time — see docs/BACKEND_DEPLOYMENT.md §GDPR.
+// Calendar retention and early erasure are enforced by the hourly maintenance
+// timer using record.deleteAfter, including retry and whole-prefix cleanup.
