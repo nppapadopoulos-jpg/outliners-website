@@ -39,7 +39,7 @@ export function loadConfig(env = process.env) {
 export function assertProductionConfig(cfg) {
   const problems = [];
   if (cfg.ipHashSalt === "dev-only-salt") problems.push("IP_HASH_SALT must be set");
-  if (cfg.retentionDays === null && cfg.retentionMonths === null) problems.push("RETENTION_MONTHS or RETENTION_DAYS must be set");
+  if (cfg.retentionMonths !== 12) problems.push("RETENTION_MONTHS must be 12 for candidate data");
   if (cfg.retentionMonths !== null && (!Number.isInteger(cfg.retentionMonths) || cfg.retentionMonths < 1)) problems.push("RETENTION_MONTHS must be positive");
   if (problems.length) throw new Error("Unsafe production configuration: " + problems.join("; "));
 }
