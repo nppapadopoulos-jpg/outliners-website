@@ -35,29 +35,18 @@ the corrected Azure deployment succeeded. No paid plan upgrade was used.
 
 ## Deployed code and gates
 
-Backend package from PR #11 commit
-`25ea0dd94d39352e1215bbb99949b97db3c4d79e` was staged with
-`api/tools/package-azure.mjs`, installed from its lockfile and deployed through
-Azure CLI. The package includes `api/src` and `api/azure`, not `api/azure` alone.
-Both Azure CLI deployment health checks and actual HTTP responses were checked.
+Current functional code is PR #11 commit
+`4739cd20811cf7dc2203ec0902a131081d647485`, deployed to the same Function App.
+The full staged API includes `api/src`, `api/azure` and lockfile dependencies.
+Real Owner login/MFA and a private synthetic CV download have now succeeded; see
+[Owner access verification](OWNER_ACCESS.md) for exact evidence and limitations.
 No merge was performed. The existing Free SWA remains in the ATCOM subscription.
-
-Subsequently, Owner-console code commit
-`e446a34114bbeeaac2f6ca3995903f1a8cefa90f` was deployed to the same Function App
-with both access gates verified disabled. It adds same-origin MSAL/PKCE assets,
-a redirect bridge and stricter v2-only token validation. CI run #128 passed.
-The Owner later explicitly approved test activation. The real sign-in attempt
-failed to complete during saved-account selection; no token/MFA outcome is known.
-Live anonymous/invalid-bearer requests returned 401 and storage isolation remained
-intact. Owner access was reset to false. The MSAL popup wait was extended from
-60 seconds to ten minutes for a new personal sign-in attempt; see OWNER_ACCESS.md.
-No successful real Owner/MFA login or CV download is claimed.
 
 - `ENABLE_LIVE_FORMS=false`; both public POST endpoints return HTTP 503 with
   `forms-not-live` before accessing storage or email.
-- `ENABLE_OWNER_DOWNLOAD=false`: Owner access is still closed. Single-tenant
-  API/client registrations now exist; see [Owner access](OWNER_ACCESS.md).
-  Actual Entra/MFA-token and private-download tests remain pending activation.
+- `ENABLE_OWNER_DOWNLOAD=true`: real Owner/MFA verification and a private
+  synthetic CV download succeeded. The fixture was cleaned up and its real
+  authenticated download subsequently returned 404. See [Owner access](OWNER_ACCESS.md).
 - `ENABLE_EMAIL_NOTIFICATIONS=false`; `NOTIFY_EMAIL=info@outliners.gr` prepared.
 - `ENABLE_RETENTION_TIMER=true`, `RETENTION_MONTHS=12` configured.
 - Existing lifecycle rule `submissions-retention-365-days` was disabled; fixed
@@ -69,17 +58,19 @@ No successful real Owner/MFA login or CV download is claimed.
 
 The owner-download implementation verifies signed Entra delegated JWTs including
 issuer, audience, expiry, tenant, exact Owner object ID, approved client,
-`CV.Read` and `amr` containing `mfa`. This implementation has signed synthetic-token
-tests; a real successful Entra/MFA download has NOT yet been demonstrated.
+`CV.Read` and `amr` containing `mfa`. Actual Entra Owner/MFA verification and a
+private synthetic download succeeded, alongside signed synthetic-token negative
+tests. No second real non-Owner/no-MFA identity was used.
 
 ## Tests actually executed
 
 ### Local and Cloud Shell tests
 
-All 55 backend tests passed locally and again inside ephemeral Cloud Shell after
-installing the API dependencies. The 25-page smoke suite and GitHub CI passed for
-the code commit before deployment. These include signed-token negative cases,
-EN/EL multipart flows, rollback, expiry, deletion retry and mocked ACS delivery.
+The earlier 55-test package passed locally and in ephemeral Cloud Shell. The
+current 60-test backend suite passed locally and in full CI #142 for the tested
+Owner/storage code, together with the 25-page smoke suite and UI regression
+checks. These include signed-token negative cases, EN/EL multipart flows,
+conflict-safe rollback, expiry, deletion retry and mocked ACS delivery.
 The staged package imports successfully; importing alone is not a Functions
 host test.
 
@@ -127,12 +118,10 @@ yet; the USD 8–9 figure remains an estimate.
 
 ## Remaining go-live gates
 
-1. The single-tenant Entra API/client and delegated `CV.Read` scope were created,
-   and the MSAL authorization-code + PKCE console was implemented. Complete the
-   gated runtime activation (exact IDs are configured), demonstrate an actual Owner access
-   token carrying MFA evidence and a successful private CV download. Keep the
-   existing MFA validation; any required paid Conditional Access licence needs
-   separate approval.
+1. Owner login, actual Entra MFA-token validation and a private synthetic CV
+   download are verified. Keep exact Owner/client/tenant/audience/scope/MFA
+   enforcement. Additional real-user negative identity tests may extend the
+   signed-token suite; no new identity licence was purchased.
 2. ACS Email resources and a verified Azure-managed sender have not been created.
    Obtain any necessary explicit service approval, configure least-privilege
    email-send access and verify synthetic delivery to `info@outliners.gr`.
@@ -144,7 +133,8 @@ yet; the USD 8–9 figure remains an estimate.
    Twelve UTC calendar months is the logical deletion deadline; seven-day soft
    delete and asynchronous physical cleanup follow it.
 5. Complete abuse controls across multiple instances (current in-memory limits
-   alone are insufficient), operational cost monitoring, and production review.
+   alone are insufficient), orphan reconciliation for ambiguous upload outcomes,
+   operational cost monitoring, and production review.
    Cost budgets alert; they do not enforce a hard maximum bill.
 6. Pass CI and obtain a separate explicit go-live decision. Do not merge or enable
    real forms as part of this staging deployment.
