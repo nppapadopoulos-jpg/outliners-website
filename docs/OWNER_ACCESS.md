@@ -1,5 +1,7 @@
 # Owner CV access — Entra, MFA and private Blob downloads
 
+> Current Dashboard implementation, verification and remaining launch gates: [TALENT_DASHBOARD.md](TALENT_DASHBOARD.md). Dated sections below are historical; their outstanding-item lists are superseded.
+
 ## Verified Azure result, 2026-11-03
 
 The approved Owner completed personal Microsoft consent. The real same-origin

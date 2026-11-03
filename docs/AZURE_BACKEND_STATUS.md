@@ -1,5 +1,7 @@
 # OutLiners private backend — verified deployment and remaining gates
 
+> Current Dashboard implementation, verification and remaining launch gates: [TALENT_DASHBOARD.md](TALENT_DASHBOARD.md). Dated sections below are historical; their outstanding-item lists are superseded.
+
 ## Approved Azure deployment, 2026-11-03
 
 The owner approved Functions Flex Consumption, Managed Identity, one Blob

@@ -1,20 +1,22 @@
 # OutLiners launch gates
 
-Preparation only. Forms stay disabled. No DNS changes or new cloud resources.
+Current evidence and limits: [Talent Dashboard verification](TALENT_DASHBOARD.md).
 
-## Ready in source
-- Form validation and local adapters
-- Proposed 12-calendar-month deadline calculation
-- Owner download authorization core
-- Dry-run-first expiry purge core
+## Completed
 
-## Must complete before activation
-- Bind owner download to verified MFA identity. Never trust a caller-supplied principal ID.
-- Connect the owner download to private Azure Blob storage and test against synthetic files.
-- Schedule deletion for both CV files and metadata, and test failure recovery.
-- Test complete end-to-end flow, including email notification failures.
-- Verify mailbox info@outliners.gr and sender identity.
-- Finalize privacy notice and lawful basis with legal review.
-- Obtain explicit owner approval for cloud cost and form activation.
+- Actual Owner Entra/MFA, private Blob list/details/review/download and PDF preview.
+- Synthetic Azure storage workflow, pagination/search/filters.
+- Durable admission/idempotency, email failure without loss, expiry/orphan recovery.
+- 80 backend tests and full CI #152 passed for deployed functional source.
+- Forms closed, no merge, public DNS change or new paid resource.
 
-Never include CV attachments, public blob links, SAS tokens, or secrets in notification emails.
+## Final requirements
+
+- Complete and approve draft privacy notice with verified controller legal identity.
+- Explicit Owner approval for PR merge/static publication and real form activation.
+- At activation, verify existing public hosting/domain route and controlled public-origin submission; no DNS change authorized.
+- Owner mobile-device smoke test before relying on mobile access.
+
+Email is optional and paused. Its failure must never undo committed submissions.
+Never include CV attachments, personal details, public Blob links, SAS tokens or
+secrets in notifications.
