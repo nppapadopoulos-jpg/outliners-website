@@ -6,7 +6,7 @@
 
 ### Ενημέρωση για την επεξεργασία βιογραφικών
 
-**Υπεύθυνος επεξεργασίας:** [ΠΛΗΡΗΣ ΝΟΜΙΚΗ ΕΠΩΝΥΜΙΑ OUTLINERS], [ΕΔΡΑ / ΔΙΕΥΘΥΝΣΗ], [ΣΤΟΙΧΕΙΑ ΕΠΙΚΟΙΝΩΝΙΑΣ]. Για ζητήματα προστασίας δεδομένων: **info@outliners.gr** (η λειτουργία του λογαριασμού εκκρεμεί επιβεβαίωση).
+**Υπεύθυνος επεξεργασίας:** OUTLINERS Ε.Ε., Καλλιρρόης 23, 11743 Αθήνα, Ελλάδα, ΑΦΜ 802260643, ΓΕΜΗ 173168403000, email: info@outliners.gr. Για ζητήματα προστασίας δεδομένων: **info@outliners.gr**.
 
 **Σκοποί:** Λαμβάνουμε το βιογραφικό και τα στοιχεία που υποβάλλετε προκειμένου να αξιολογήσουμε την επαγγελματική σας εμπειρία, να επικοινωνήσουμε μαζί σας και, εφόσον υπάρχει κατάλληλη νόμιμη βάση, να εξετάσουμε πιθανές επαγγελματικές ευκαιρίες. Η διαβίβαση στοιχείων σε συγκεκριμένο εργοδότη/πελάτη πρέπει να εξηγείται με διαφάνεια και να πραγματοποιείται μόνο με κατάλληλη νόμιμη βάση και αναγκαία ενημέρωση.
 
@@ -18,9 +18,9 @@
 
 **Πρόσβαση και αποδέκτες:** Η ανθρώπινη πρόσβαση στα αποθηκευμένα βιογραφικά θα περιορίζεται αποκλειστικά στον ιδιοκτήτη/διαχειριστή της OutLiners. Εξουσιοδοτημένοι τεχνικοί πάροχοι μπορεί να επεξεργάζονται δεδομένα ως εκτελούντες την επεξεργασία με κατάλληλες συμβάσεις. Ενδεχόμενη κοινοποίηση σε εργοδότες απαιτεί χωριστή, διαφανή τεκμηρίωση πριν πραγματοποιηθεί.
 
-**Ασφάλεια:** Προβλέπεται ιδιωτική αποθήκευση σε περιοχή της ΕΕ, περιορισμένη πρόσβαση, πολυπαραγοντική ταυτοποίηση και μηχανισμοί διαγραφής. Οι ρυθμίσεις δεν έχουν ακόμη ενεργοποιηθεί ή ελεγχθεί σε παραγωγή.
+**Ασφάλεια:** Προβλέπεται ιδιωτική αποθήκευση σε περιοχή της ΕΕ, περιορισμένη πρόσβαση, πολυπαραγοντική ταυτοποίηση και μηχανισμοί διαγραφής. Οι έλεγχοι ασφαλούς πρόσβασης Owner, MFA και ιδιωτικής αποθήκευσης έχουν δοκιμαστεί στο Azure με συνθετικά δεδομένα. Οι δημόσιες υποβολές παραμένουν απενεργοποιημένες έως το go-live.
 
-**Δικαιώματα:** Μπορείτε, ανάλογα με την περίπτωση, να ζητήσετε πρόσβαση, διόρθωση, διαγραφή, περιορισμό, φορητότητα, να εναντιωθείτε στην επεξεργασία ή να ανακαλέσετε συγκατάθεση χωρίς αναδρομική επίδραση στη νομιμότητα της προηγούμενης επεξεργασίας. Επικοινωνία: info@outliners.gr (μετά την ενεργοποίηση). Μπορείτε επίσης να υποβάλετε καταγγελία στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).
+**Δικαιώματα:** Μπορείτε, ανάλογα με την περίπτωση, να ζητήσετε πρόσβαση, διόρθωση, διαγραφή, περιορισμό, φορητότητα, να εναντιωθείτε στην επεξεργασία ή να ανακαλέσετε συγκατάθεση χωρίς αναδρομική επίδραση στη νομιμότητα της προηγούμενης επεξεργασίας. Επικοινωνία: info@outliners.gr. Μπορείτε επίσης να υποβάλετε καταγγελία στην Αρχή Προστασίας Δεδομένων Προσωπικού Χαρακτήρα (www.dpa.gr).
 
 **Διεθνείς διαβιβάσεις:** [ΝΑ ΕΠΙΒΕΒΑΙΩΘΟΥΝ ΤΟΠΟΘΕΣΙΕΣ, ΥΠΟΕΚΤΕΛΟΥΝΤΕΣ ΚΑΙ ΤΥΧΟΝ ΔΙΑΒΙΒΑΣΕΙΣ ΕΚΤΟΣ ΕΟΧ ΜΕΤΑ ΤΗΝ ΕΠΙΛΟΓΗ ΥΠΗΡΕΣΙΩΝ].
 
@@ -30,7 +30,7 @@
 
 ### Candidate CV privacy notice
 
-**Data controller:** [FULL REGISTERED OUTLINERS LEGAL ENTITY], [REGISTERED ADDRESS], [CONTACT DETAILS]. Privacy contact: **info@outliners.gr** (mailbox activation pending).
+**Data controller:** OUTLINERS E.E. (Greek general partnership), 23 Kallirrois Street, 11743 Athens, Greece, Greek Tax ID 802260643, GEMI registration 173168403000, email: info@outliners.gr. Privacy contact: **info@outliners.gr**.
 
 **Purposes:** We receive the CV and information you voluntarily submit to assess your professional background, contact you, and, where a valid legal basis applies, consider relevant employment opportunities. Any disclosure to an employer/client must be separately transparent and supported by an appropriate legal basis.
 
@@ -42,16 +42,16 @@
 
 **Access and recipients:** Human access to stored CVs is restricted to the OutLiners owner/operator. Authorized infrastructure processors may process data under appropriate contractual safeguards. Any sharing with prospective employers requires a separately documented transparent process.
 
-**Security:** Planned controls include private EU-region storage, restricted access, MFA and deletion mechanisms. These controls are not yet live or production-validated.
+**Security:** Planned controls include private EU-region storage, restricted access, MFA and deletion mechanisms. Owner MFA, private storage and retrieval were tested in Azure using synthetic data. Public submissions remain disabled pending go-live.
 
-**Your rights:** Depending on circumstances, you may request access, correction, erasure, restriction, portability, object to processing or withdraw consent without affecting the lawfulness of processing before withdrawal. Contact info@outliners.gr once active. You may also complain to the Hellenic Data Protection Authority (www.dpa.gr).
+**Your rights:** Depending on circumstances, you may request access, correction, erasure, restriction, portability, object to processing or withdraw consent without affecting the lawfulness of processing before withdrawal. Contact info@outliners.gr. You may also complain to the Hellenic Data Protection Authority (www.dpa.gr).
 
 **International transfers:** [VERIFY ACTUAL PROCESSORS, LOCATIONS AND ANY EEA-EXTERNAL TRANSFERS BEFORE ACTIVATION].
 
 **Automated decision-making:** [VERIFY — the current design does not propose automated candidate evaluation or rejection].
 
 ## Before any publication or activation
-- [ ] Confirm controller's registered name and address.
+- [x] Confirm controller's registered name and address (GEMI notice provided by owner, 2026-11-04).
 - [ ] Legal review of lawful basis per purpose, future-opportunity opt-in and consent UX.
 - [ ] Approve candidate and employer-specific retention schedules; exact 12-calendar-month deletion semantics.
 - [ ] Confirm mailbox and processor agreements, subprocessor disclosures, international transfers.
