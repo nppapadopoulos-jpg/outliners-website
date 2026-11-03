@@ -63,24 +63,38 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
     // Never expose a Blob URL, SAS token, or container credentials to callers.
     async readSubmissionFile(id) {
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || "")) return null;
+      let phase = 'client';
+      try {
       const c = await container();
+      phase = 'list';
       for (const form of ["submit-cv"]) {
         // Month is not supplied by the caller. Search only metadata paths.
         for await (const blob of c.listBlobsFlat({ prefix: `submissions/${form}/` })) {
           if (!blob.name.endsWith(`/${id}/submission.json`)) continue;
           const base = blob.name.slice(0, -"/submission.json".length);
+          phase = 'metadata';
           const recordBlob = await c.getBlockBlobClient(blob.name).downloadToBuffer();
           const record = JSON.parse(recordBlob.toString("utf8"));
           if (record.id !== id || record.form !== form || !record.file?.name || !Number.isFinite(Date.parse(record.deleteAfter)) || Date.parse(record.deleteAfter) <= now()) return null;
           const filename = record.file.name;
           if (!safeFilename(filename)) return null;
+          phase = 'properties';
           const props = await c.getBlockBlobClient(`${base}/${filename}`).getProperties();
           if (!Number.isInteger(props.contentLength) || props.contentLength > 5 * 1024 * 1024 || props.contentLength !== record.file.bytes) return null;
+          phase = 'download';
           const bytes = await c.getBlockBlobClient(`${base}/${filename}`).downloadToBuffer();
           return { bytes };
         }
       }
       return null;
+      } catch (error) {
+        // Keep only operational fields for the Owner's fixed error categories.
+        // SDK response bodies, request headers and URLs must not leave here.
+        throw Object.assign(new Error('Private storage read failed'), {
+          name: error?.name, code: error?.code, statusCode: error?.statusCode,
+          storagePhase: phase,
+        });
+      }
     },
 
     async *list() {

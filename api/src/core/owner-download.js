@@ -17,6 +17,9 @@ export function createOwnerDownload({ storage, ownerPrincipalId, audit = () => {
       else if (error?.code === 'ContainerNotFound') reason = 'container-missing';
       else if ([401, 403].includes(error?.statusCode)) reason = 'access-denied';
       else if (error?.code === 'BlobNotFound') reason = 'missing-file';
+      else if (error?.statusCode === 404 && error?.storagePhase === 'list') reason = 'container-missing';
+      else if (error?.statusCode === 404 && error?.storagePhase === 'metadata') reason = 'metadata';
+      else if (error?.statusCode === 404 && ['properties', 'download'].includes(error?.storagePhase)) reason = 'missing-file';
       else if (error?.statusCode === 404) reason = 'resource-missing';
       else if (['ENOTFOUND', 'EAI_AGAIN', 'REQUEST_SEND_ERROR'].includes(error?.code)) reason = 'network';
       else if (error?.name === 'SyntaxError') reason = 'metadata';
