@@ -1,5 +1,9 @@
 # Forms backend — deployment guide
 
+**Current verified state and outstanding approvals:** [AZURE_BACKEND_STATUS.md](AZURE_BACKEND_STATUS.md).
+The historical architecture/cost assumptions below are not a verified Azure
+deployment or current price quote. Use the current status before provisioning.
+
 Status: code complete and locally tested (see `api/README.md` for the honest
 tested-vs-untested breakdown). **Nothing is deployed; no cloud resources,
 DNS or email configuration exist.** This document is the runbook for when the

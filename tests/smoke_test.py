@@ -32,7 +32,9 @@ def resolve(href):
 
 
 def main():
-    pages = sorted(glob.glob(os.path.join(ROOT, "**", "*.html"), recursive=True))
+    pages = sorted(p for p in glob.glob(os.path.join(ROOT, "**", "*.html"), recursive=True)
+                   if "node_modules" not in os.path.relpath(p, ROOT).split(os.sep)
+                   and os.path.relpath(p, ROOT).split(os.sep)[0] != "api")
     if len(pages) < 10:
         err(f"expected at least 10 pages, found {len(pages)}")
 

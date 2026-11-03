@@ -116,11 +116,12 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
       return json(200, { ok: true, id: dupOf, duplicate: true });
     }
 
+    const receivedAt = Date.now();
     const record = {
       id,
       form: formName,
-      receivedAt: new Date().toISOString(),
-      deleteAfter: config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths) : deleteAfter(config.retentionDays),
+      receivedAt: new Date(receivedAt).toISOString(),
+      deleteAfter: config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths, receivedAt) : deleteAfter(config.retentionDays, receivedAt),
       consent: { value: "yes", recordedAt: new Date().toISOString() },
       fields: Object.fromEntries(Object.entries(fields).filter(([k]) => k !== "consent")),
       file: file ? { name: file.storedName, type: file.type, bytes: file.bytes } : null,
@@ -130,6 +131,7 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
     try {
       storagePath = await storage.store({ id, form: formName, record, file });
     } catch (err) {
+      duplicates.forget(formName, fields.email, id);
       logger.error({ ...base, event: "storage-failed", id, reason: err?.code || "error" });
       return json(502, { ok: false, retry: true });
     }
@@ -138,7 +140,8 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
     // in private storage; the failure is logged for manual follow-up.
     let notified = true;
     try {
-      await email.send(buildNotification({ form: formName, id, fields, file, storagePath, config }));
+      const result = await email.send(buildNotification({ form: formName, id, fields, file, storagePath, config }));
+      notified = result?.delivered !== false;
     } catch (err) {
       notified = false;
       logger.error({ ...base, event: "notify-failed", id, reason: err?.code || "error" });

@@ -26,7 +26,15 @@ jobs:
         with:
           node-version: "22"
       - name: Run backend test suite
-        run: node --test api/tests/*.test.mjs
+        run: |
+          npm ci --prefix api --ignore-scripts --no-audit --no-fund
+          node --test api/tests/*.test.mjs
+      - name: Verify complete Azure deployment package
+        run: |
+          node api/tools/package-azure.mjs "$RUNNER_TEMP/outliners-api"
+          cd "$RUNNER_TEMP/outliners-api"
+          npm ci --ignore-scripts --no-audit --no-fund
+          node -e "import('./azure/src/index.js')"
 
   ui-regression:
     name: UI regression (axe accessibility, nav wrap, overflow)

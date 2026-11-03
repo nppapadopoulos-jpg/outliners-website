@@ -7,7 +7,9 @@ export function createOwnerDownload({ storage, ownerPrincipalId, audit = () => {
   return async function download({ principalId, submissionId }) {
     if (!principalId || principalId !== ownerPrincipalId) return new Response(null, { status: 403, headers: { "cache-control": "no-store" } });
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(submissionId || "")) return new Response(null, { status: 400 });
-    const result = await storage.readSubmissionFile(submissionId);
+    let result;
+    try { result = await storage.readSubmissionFile(submissionId); }
+    catch { return new Response(null, { status: 503, headers: { 'cache-control': 'no-store' } }); }
     if (!result) return new Response(null, { status: 404 });
     audit({ event: "owner-cv-download", id: submissionId });
     return new Response(result.bytes, { status: 200, headers: {
