@@ -38,3 +38,15 @@ export function deleteAfter(retentionDays, now = Date.now()) {
   if (retentionDays === null || retentionDays === undefined) return null;
   return new Date(now + retentionDays * 86400_000).toISOString();
 }
+
+// Exact UTC calendar-month retention; clamps end-of-month dates.
+export function deleteAfterMonths(months, now = Date.now()) {
+  if (months == null) return null;
+  if (!Number.isInteger(months) || months < 1) throw new RangeError("Invalid retention months");
+  const start = new Date(now);
+  if (Number.isNaN(start.getTime())) throw new RangeError("Invalid timestamp");
+  const year = start.getUTCFullYear();
+  const month = start.getUTCMonth() + months;
+  const last = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+  return new Date(Date.UTC(year, month, Math.min(start.getUTCDate(), last), start.getUTCHours(), start.getUTCMinutes(), start.getUTCSeconds(), start.getUTCMilliseconds())).toISOString();
+}

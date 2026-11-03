@@ -32,19 +32,55 @@ export function createBlobStorage(env) {
       const month = record.receivedAt.slice(0, 7);
       const base = `submissions/${form}/${month}/${id}`;
       const c = await container();
-      await c.getBlockBlobClient(`${base}/submission.json`).upload(
-        JSON.stringify(record, null, 2), Buffer.byteLength(JSON.stringify(record, null, 2)),
-        { blobHTTPHeaders: { blobContentType: "application/json" } });
+      // Commit metadata last so partial uploads are not treated as submissions.
       if (file) {
         await c.getBlockBlobClient(`${base}/${file.storedName}`).uploadData(file.content, {
           blobHTTPHeaders: { blobContentType: "application/octet-stream" },
         });
       }
+      const payload = JSON.stringify(record, null, 2);
+      await c.getBlockBlobClient(`${base}/submission.json`).upload(
+        payload, Buffer.byteLength(payload),
+        { blobHTTPHeaders: { blobContentType: "application/json" } });
       return base;
+    },
+
+
+    // Resolve a submission by UUID without accepting arbitrary blob paths.
+    // Never expose a Blob URL, SAS token, or container credentials to callers.
+    async readSubmissionFile(id) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || "")) return null;
+      const c = await container();
+      for (const form of ["submit-cv"]) {
+        // Month is not supplied by the caller. Search only metadata paths.
+        for await (const blob of c.listBlobsFlat({ prefix: `submissions/${form}/` })) {
+          if (!blob.name.endsWith(`/${id}/submission.json`)) continue;
+          const base = blob.name.slice(0, -"/submission.json".length);
+          const recordBlob = await c.getBlockBlobClient(blob.name).downloadToBuffer();
+          const record = JSON.parse(recordBlob.toString("utf8"));
+          if (record.id !== id || !record.file?.name || (!record.deleteAfter || Date.parse(record.deleteAfter) <= Date.now())) return null;
+          const filename = record.file.name;
+          if (filename.includes("/") || filename.includes("\\\\") || filename === "." || filename === "..") return null;
+          const bytes = await c.getBlockBlobClient(`${base}/${filename}`).downloadToBuffer();
+          return { bytes };
+        }
+      }
+      return null;
+    },
+
+    async *list() {
+      const c = await container();
+      for await (const blob of c.listBlobsFlat({ prefix: "submissions/" })) {
+        if (!blob.name.endsWith("/submission.json")) continue;
+        const relPath = blob.name.slice(0, -"/submission.json".length);
+        const raw = await c.getBlockBlobClient(blob.name).downloadToBuffer();
+        yield { relPath, record: JSON.parse(raw.toString("utf8")) };
+      }
     },
 
     // Data-subject deletion: remove every blob under the submission prefix.
     async deleteSubmission(relPath) {
+      if (typeof relPath !== "string" || !/^submissions\/(request-talent|submit-cv)\/\d{4}-\d{2}\/[0-9a-f-]{36}$/i.test(relPath)) throw new Error("Invalid submission path");
       const c = await container();
       for await (const blob of c.listBlobsFlat({ prefix: relPath + "/" })) {
         await c.deleteBlob(blob.name);

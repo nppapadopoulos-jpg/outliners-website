@@ -1,0 +1,64 @@
+name: Azure staging (Free Static Web App)
+
+on:
+  push:
+    branches:
+      - feature/story-captions-email
+    paths:
+      - ".github/workflows/azure-staging.yml"
+      - "index.html"
+      - "404.html"
+      - "favicon.png"
+      - "assets/**"
+      - "about/**"
+      - "contact/**"
+      - "cookies/**"
+      - "el/**"
+      - "industries/**"
+      - "privacy-policy/**"
+      - "request-talent/**"
+      - "services/**"
+      - "submit-cv/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: outliners-azure-staging
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Publish static preview to Azure
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble public-only staging site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p staging
+          cp index.html 404.html favicon.png staging/
+          cp -R assets about contact cookies el industries privacy-policy request-talent services submit-cv staging/
+          printf 'User-agent: *\nDisallow: /\n' > staging/robots.txt
+          cat > staging/staticwebapp.config.json <<'JSON'
+          {
+            "globalHeaders": {
+              "X-Robots-Tag": "noindex, nofollow, noarchive"
+            }
+          }
+          JSON
+          test -f staging/el/index.html
+          test ! -e staging/api
+          test ! -e staging/docs
+      - name: Deploy to Azure Static Web Apps (Free)
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: staging
+          api_location: ""
+          output_location: ""
+          skip_app_build: true

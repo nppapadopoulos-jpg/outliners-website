@@ -8,7 +8,7 @@ import { FORMS } from "./schema.js";
 import { validateFields, sanitizeFilename } from "./validate.js";
 import { checkFile } from "./files.js";
 import { isHoneypotTripped, isTooFast, createRateLimiter, createDuplicateGuard } from "./spam.js";
-import { ipHash, newSubmissionId, createLogger, deleteAfter } from "./privacy.js";
+import { ipHash, newSubmissionId, createLogger, deleteAfter, deleteAfterMonths } from "./privacy.js";
 import { buildNotification } from "./notify.js";
 
 const JSON_HEADERS = {
@@ -120,7 +120,7 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
       id,
       form: formName,
       receivedAt: new Date().toISOString(),
-      deleteAfter: deleteAfter(config.retentionDays),
+      deleteAfter: config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths) : deleteAfter(config.retentionDays),
       consent: { value: "yes", recordedAt: new Date().toISOString() },
       fields: Object.fromEntries(Object.entries(fields).filter(([k]) => k !== "consent")),
       file: file ? { name: file.storedName, type: file.type, bytes: file.bytes } : null,
