@@ -47,9 +47,19 @@ successful CV access; all exact-identity and MFA checks still apply in the API.
 - Local: 55 backend tests passed, including signed synthetic tokens rejecting
   wrong Owner, tenant, audience, issuer, client, missing scope/MFA, wrong token
   version, expired and forged tokens. The 25-page smoke suite passed.
-- Cloud: registrations created successfully. Runtime deployment, actual Owner
-  login/token MFA verification and synthetic CV download are pending at this
-  checkpoint. Do not treat unit-token tests as real Entra sign-in evidence.
+- Cloud: registrations were created successfully. Commit
+  `e446a34114bbeeaac2f6ca3995903f1a8cefa90f` was deployed to the existing Function
+  App with both Owner and public-form gates verified disabled. Azure CLI reported
+  successful deployment; external HTTP checks returned console JS 200 and Owner
+  config/session/download plus both public forms 503. MSAL and redirect-bridge
+  assets also returned 200. Exact tenant/audience/client/Owner IDs are configured
+  in Azure with `ENABLE_OWNER_DOWNLOAD=false`.
+- CI run #128 (`41693955532`) passed for the deployed code commit.
+- Activation was rejected by automatic approval review because enabling Owner
+  downloads creates security-sensitive access and requires action-time approval.
+  No attempt was made to bypass that restriction. Actual Owner login/token MFA
+  verification, synthetic CV download and real non-Owner/MFA-negative sign-in
+  tests are NOT completed. Unit-token tests are not real Entra sign-in evidence.
 - If Entra requires admin consent or personal MFA interaction, pause that step
   for the Owner. Never weaken MFA or purchase Conditional Access licences to
   get a green test. A real non-Owner account test requires a separate authorised

@@ -42,10 +42,18 @@ Azure CLI. The package includes `api/src` and `api/azure`, not `api/azure` alone
 Both Azure CLI deployment health checks and actual HTTP responses were checked.
 No merge was performed. The existing Free SWA remains in the ATCOM subscription.
 
+Subsequently, Owner-console code commit
+`e446a34114bbeeaac2f6ca3995903f1a8cefa90f` was deployed to the same Function App
+with both access gates verified disabled. It adds same-origin MSAL/PKCE assets,
+a redirect bridge and stricter v2-only token validation. CI run #128 passed.
+Owner activation was rejected by automatic approval review pending action-time
+approval; no successful real Owner/MFA login or download is claimed.
+
 - `ENABLE_LIVE_FORMS=false`; both public POST endpoints return HTTP 503 with
   `forms-not-live` before accessing storage or email.
-- `ENABLE_OWNER_DOWNLOAD=false`: the download route exists but is intentionally
-  closed until real Entra application/client registration and MFA-token tests.
+- `ENABLE_OWNER_DOWNLOAD=false`: Owner access is still closed. Single-tenant
+  API/client registrations now exist; see [Owner access](OWNER_ACCESS.md).
+  Actual Entra/MFA-token and private-download tests remain pending activation.
 - `ENABLE_EMAIL_NOTIFICATIONS=false`; `NOTIFY_EMAIL=info@outliners.gr` prepared.
 - `ENABLE_RETENTION_TIMER=true`, `RETENTION_MONTHS=12` configured.
 - Existing lifecycle rule `submissions-retention-365-days` was disabled; fixed
@@ -115,9 +123,9 @@ yet; the USD 8–9 figure remains an estimate.
 
 ## Remaining go-live gates
 
-1. Register the single-tenant Entra API/client in OUTLINERS, expose delegated
-   `CV.Read`, configure exact approved client/audience/Owner IDs, and implement
-   MSAL authorization-code + PKCE sign-in. Demonstrate an actual Owner access
+1. The single-tenant Entra API/client and delegated `CV.Read` scope were created,
+   and the MSAL authorization-code + PKCE console was implemented. Complete the
+   gated runtime activation (exact IDs are configured), demonstrate an actual Owner access
    token carrying MFA evidence and a successful private CV download. Keep the
    existing MFA validation; any required paid Conditional Access licence needs
    separate approval.
