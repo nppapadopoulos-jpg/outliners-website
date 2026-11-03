@@ -121,8 +121,28 @@
         return;
       }
 
-      // Future (backend live): build FormData and POST to form.action per
-      // docs/FORMS_BACKEND_CONTRACT.md. Intentionally not implemented yet.
+      // The preview attribute is a separate launch gate. No request reaches this
+      // branch unless an approved release explicitly sets data-preview="false".
+      if (form.dataset.preview !== "false") return;
+      var english = document.documentElement.lang !== "el";
+      var button = form.querySelector('button[type="submit"]');
+      if (button) button.disabled = true;
+      var apiOrigin = "https://func-outliners-api-8dc62205-cudka7c9c7hdajdk.northeurope-01.azurewebsites.net";
+      var endpoint = new URL(form.getAttribute("action"), apiOrigin);
+      if (endpoint.origin !== apiOrigin || !/^\/api\/(submit-cv|request-talent)$/.test(endpoint.pathname)) return;
+      fetch(endpoint.href, { method: "POST", body: new FormData(form), credentials: "omit", redirect: "error" })
+        .then(function (response) {
+          if (!response.ok) throw { status: response.status };
+          return response.json();
+        }).then(function (result) {
+          if (result.ok !== true) throw {};
+          if (status) { status.textContent = english ? "Thank you. Your submission has been stored securely." : "Σε ευχαριστούμε. Η υποβολή σου αποθηκεύτηκε με ασφάλεια."; status.hidden = false; status.focus(); }
+          form.reset(); if (started) started.value = String(Date.now());
+        }).catch(function (error) {
+          if (status) { status.textContent = error.status === 429
+            ? (english ? "Please try again later. The submission limit has been reached." : "Δοκίμασε ξανά αργότερα. Έχει συμπληρωθεί το όριο υποβολών.")
+            : (english ? "Your submission could not be completed. Please check the fields and try again." : "Η υποβολή δεν ολοκληρώθηκε. Έλεγξε τα πεδία και δοκίμασε ξανά."); status.hidden = false; status.focus(); }
+        }).finally(function () { if (button) button.disabled = false; });
     });
   });
 })();

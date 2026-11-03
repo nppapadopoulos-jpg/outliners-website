@@ -124,13 +124,14 @@ test('invalid expiry and unsafe filename cannot be downloaded; corrupt records d
   assert.deepEqual(records, []);
 });
 
-test('metadata upload failure rolls back uncommitted CV', async () => {
+test('metadata upload failure preserves uncommitted CV for safe reconciliation', async () => {
   const c = fakeContainer(), storage = createBlobStorage(storageEnv,{containerClient:c});
   c.failMetadata(true);
   const id = 'b07d94a5-4d3f-432d-90a3-324980984e15';
   const record = {id, form:'submit-cv',receivedAt:'2026-01-01T00:00:00Z',file:{name:'cv.pdf'}};
   await assert.rejects(storage.store({id,form:'submit-cv',record,file:{storedName:'cv.pdf',content:Buffer.from('synthetic')}}));
-  assert.equal(c.blobs.size, 0);
+  assert.equal(c.blobs.size, 1);
+  assert.equal(c.deletes.length, 0);
 });
 
 test('a 409 or 412 on duplicate CV upload never deletes an existing committed file', async () => {

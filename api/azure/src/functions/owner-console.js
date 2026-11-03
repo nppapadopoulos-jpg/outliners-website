@@ -9,7 +9,7 @@ const headers = {
   'cache-control': 'no-store', 'x-content-type-options': 'nosniff',
   'referrer-policy': 'no-referrer', 'x-robots-tag': 'noindex, nofollow',
   'permissions-policy': 'camera=(), microphone=(), geolocation=()',
-  'content-security-policy': "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://login.microsoftonline.com; frame-src https://login.microsoftonline.com; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'",
+  'content-security-policy': "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self' https://login.microsoftonline.com; frame-src https://login.microsoftonline.com; worker-src 'self'; img-src 'self' blob: data:; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'",
 };
 const enabled = () => process.env.ENABLE_OWNER_DOWNLOAD === 'true';
 app.http('ownerConsole', {
@@ -20,7 +20,12 @@ app.http('ownerCallback', {
   methods: ['GET'], authLevel: 'anonymous', route: 'owner/callback',
   handler: async () => ({ status: 200, headers: { ...headers, 'content-type': 'text/html; charset=utf-8' }, body: await readFile(new URL('callback.html', root), 'utf8') }),
 });
+const pdfVendor = new URL('../../../node_modules/pdfjs-dist/legacy/build/', import.meta.url);
 const assets = new Map([
+  ['pdf.mjs', [new URL('pdf.mjs', pdfVendor), 'text/javascript']],
+  ['pdf.worker.mjs', [new URL('pdf.worker.mjs', pdfVendor), 'text/javascript']],
+  ['icon.svg', [new URL('icon.svg', root), 'image/svg+xml']],
+  ['manifest.webmanifest', [new URL('manifest.webmanifest', root), 'application/manifest+json']],
   ['console.js', [new URL('console.js', root), 'text/javascript']],
   ['console.css', [new URL('console.css', root), 'text/css']],
   ['callback.js', [new URL('callback.js', root), 'text/javascript']],

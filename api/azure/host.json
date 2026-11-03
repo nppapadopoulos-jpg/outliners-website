@@ -8,5 +8,12 @@
     "logLevel": {
       "default": "Information"
     }
+  },
+  "extensions": {
+    "http": {
+      "maxConcurrentRequests": 4,
+      "maxOutstandingRequests": 20,
+      "dynamicThrottlesEnabled": true
+    }
   }
 }

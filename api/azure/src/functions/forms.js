@@ -10,12 +10,16 @@ import { createBlobStorage } from "../../../src/adapters/azure/storage-blob.js";
 
 import { createPublicFormsEndpoint } from "../../../src/core/forms-gate.js";
 
+import { createBlobControl } from '../../../src/adapters/azure/blob-control.js';
+import { createDurableAdmission } from '../../../src/core/durable-admission.js';
 const handle = createPublicFormsEndpoint(process.env, () => {
   const config = loadConfig();
   assertProductionConfig(config);
+  const base=createBlobStorage(process.env);
+  const storage=createDurableAdmission({control:createBlobControl(process.env,'security/intake-control.json'),storage:base,secret:config.ipHashSalt});
   return createFormsHandler({
     config,
-    storage: createBlobStorage(process.env),
+    storage,
     // Committed metadata is the durable discovery marker. The timer creates
     // notification state even after a crash between intake and dispatch.
     email: { send: async () => ({ delivered: false, queued: true }) },
@@ -28,7 +32,11 @@ function register(name) {
     authLevel: "anonymous",
     route: name,
     handler: async (request, context) => {
-      const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+      const origin=request.headers.get('origin');
+      const allowed=(process.env.PUBLIC_FORM_ORIGINS || 'https://outliners.gr,https://www.outliners.gr').split(',');
+      if(process.env.ENABLE_LIVE_FORMS==='true' && (!origin || !allowed.includes(origin)))return {status:403,headers:{'cache-control':'no-store'}};
+      // App Service appends its observed peer; never trust an injected first XFF value.
+      const clientIp = request.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim();
       const response = await handle(name, request, { clientIp });
       return {
         status: response.status,

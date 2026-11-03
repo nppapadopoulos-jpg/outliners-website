@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 // Azure Blob Storage adapter. Verified with synthetic data in Azure using
 // Managed Identity and a Blob Private Endpoint. Public intake remains closed.
 // See docs/AZURE_BACKEND_STATUS.md for the exact checks and remaining gates.
@@ -29,7 +30,23 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
   }
 
   return {
-    async store({ id, form, record, file }) {
+    async hasCommitted(path,id) {
+      if (!/^submissions\/(submit-cv|request-talent)\/\d{4}-\d{2}\/[0-9a-f-]{36}$/i.test(path)) throw new Error('Invalid committed path');
+      try { const c=await container(); const raw=await c.getBlockBlobClient(path+'/submission.json').downloadToBuffer(); const record=JSON.parse(raw.toString()); return record.id===id; }
+      catch(e) { if(e.statusCode===404)return false;throw new Error('Commit verification unavailable'); }
+    },
+    async reconcileOrphans({now=Date.now(),graceMs=86400000}={}) {
+      const c=await container(),groups=new Map();
+      for await(const b of c.listBlobsFlat({prefix:'submissions/'})) {
+        const match=b.name.match(/^(submissions\/(?:submit-cv|request-talent)\/\d{4}-\d{2}\/[0-9a-f-]{36})\/[^/]+$/i); if(!match)continue;
+        const group=groups.get(match[1])||{names:[],committed:false,fresh:false};group.names.push(b.name);if(b.name.endsWith('/submission.json'))group.committed=true;
+        const modified=Date.parse(b.properties?.lastModified);if(!Number.isFinite(modified)||now-modified<graceMs)group.fresh=true;groups.set(match[1],group);
+      }
+      let removed=0,failed=0;
+      for(const group of groups.values())if(!group.committed&&!group.fresh){try{for(const name of group.names){try{await c.deleteBlob(name);}catch(e){if(e.statusCode!==404)throw e;}}removed++;}catch{failed++;}}
+      return {removed,failed};
+    },
+    async store({ id, form, record, file, resumePending = false }) {
       if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id || '') || !['request-talent', 'submit-cv'].includes(form) || record.id !== id || record.form !== form || !Number.isFinite(Date.parse(record.receivedAt))) throw new Error('Invalid submission');
       if (file && (!safeFilename(file.storedName) || record.file?.name !== file.storedName)) throw new Error('Invalid filename');
       const month = record.receivedAt.slice(0, 7);
@@ -39,23 +56,31 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
       let fileCreated = false;
       try {
       if (file) {
-        await c.getBlockBlobClient(`${base}/${file.storedName}`).uploadData(file.content, {
-          blobHTTPHeaders: { blobContentType: "application/octet-stream" }, conditions: { ifNoneMatch: '*' },
-        });
-        fileCreated = true;
+        try {
+          await c.getBlockBlobClient(`${base}/${file.storedName}`).uploadData(file.content, {
+            blobHTTPHeaders: { blobContentType: "application/octet-stream" }, conditions: { ifNoneMatch: '*' },
+          });
+          fileCreated = true;
+        } catch (error) {
+          if (!resumePending || ![409,412].includes(error.statusCode)) throw error;
+          const existing = await c.getBlockBlobClient(`${base}/${file.storedName}`).downloadToBuffer();
+          const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+          if (existing.length !== file.content.length || hash(existing) !== hash(file.content)) throw new Error('Pending file mismatch');
+        }
       }
       const payload = JSON.stringify(record, null, 2);
       await c.getBlockBlobClient(`${base}/submission.json`).upload(
         payload, Buffer.byteLength(payload),
         { blobHTTPHeaders: { blobContentType: "application/json" }, conditions: { ifNoneMatch: '*' } });
       } catch (error) {
-        // An uncommitted file must not be left indefinitely without metadata.
-        // Never roll back a file whose conditional upload failed. Azure can
-        // report an existing blob as 409 as well as 412; neither conflict may
-        // remove an existing CV or a file referenced by committed metadata.
-        if (fileCreated && ![409, 412].includes(error.statusCode)) {
-          try { await c.deleteBlob(`${base}/${file.storedName}`); }
-          catch { audit({ event: 'storage-rollback-failed', id }); }
+        // An ambiguous metadata response may have committed. Never delete a CV
+        // during rollback: reconcile metadata or let the 24h orphan sweep retry.
+        if (fileCreated) {
+          try {
+            const committed=JSON.parse((await c.getBlockBlobClient(`${base}/submission.json`).downloadToBuffer()).toString('utf8'));
+            if(committed.id===id && committed.form===form && committed.file?.name===record.file?.name && committed.file?.bytes===record.file?.bytes)return base;
+          } catch {}
+          audit({ event: 'storage-pending-reconciliation', id });
         }
         throw error;
       }
@@ -71,7 +96,7 @@ export function createBlobStorage(env, { containerClient: injectedContainer, now
       try {
       const c = await container();
       phase = 'list';
-      for (const form of ["submit-cv"]) {
+      for (const form of ["submit-cv", "request-talent"]) {
         // Month is not supplied by the caller. Search only metadata paths.
         for await (const blob of c.listBlobsFlat({ prefix: `submissions/${form}/` })) {
           if (!blob.name.endsWith(`/${id}/submission.json`)) continue;
