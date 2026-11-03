@@ -27,7 +27,8 @@ CV storage still has public network access Disabled, anonymous access false,
 Shared Key false, HTTPS required and TLS 1.2 minimum. Blob/container soft delete
 remains seven days and versioning remains disabled. No CV storage account was
 duplicated. No NAT Gateway, Private Resolver, extra Private Endpoint, Application
-Insights, Log Analytics or ACS Email service was created.
+Insights or Log Analytics was created during the original storage deployment.
+The separately approved ACS Email addition is documented in [EMAIL_NOTIFICATIONS.md](EMAIL_NOTIFICATIONS.md).
 
 The initial portal deployment hit a subnet/storage dependency race. The same
 resources were reused with an explicit dependency on the subnet deployment;
@@ -36,7 +37,9 @@ the corrected Azure deployment succeeded. No paid plan upgrade was used.
 ## Deployed code and gates
 
 Current functional code is PR #11 commit
-`4739cd20811cf7dc2203ec0902a131081d647485`, deployed to the same Function App.
+`c2dd25945a3ca97be41316c01279940bc940084e`, deployed to the same Function App.
+This adds the durable ACS notification dispatcher; final email dispatch remains
+paused because the recipient returned a hard bounce. See [email verification](EMAIL_NOTIFICATIONS.md).
 The full staged API includes `api/src`, `api/azure` and lockfile dependencies.
 Real Owner login/MFA and a private synthetic CV download have now succeeded; see
 [Owner access verification](OWNER_ACCESS.md) for exact evidence and limitations.
@@ -47,7 +50,9 @@ No merge was performed. The existing Free SWA remains in the ATCOM subscription.
 - `ENABLE_OWNER_DOWNLOAD=true`: real Owner/MFA verification and a private
   synthetic CV download succeeded. The fixture was cleaned up and its real
   authenticated download subsequently returned 404. See [Owner access](OWNER_ACCESS.md).
-- `ENABLE_EMAIL_NOTIFICATIONS=false`; `NOTIFY_EMAIL=info@outliners.gr` prepared.
+- `ENABLE_EMAIL_NOTIFICATIONS=false`; ACS Managed Identity sending was tested,
+  but both real synthetic emails hard-bounced with SMTP 550 / 5.1.1.
+  Fix the existing recipient mailbox/address before another delivery test.
 - `ENABLE_RETENTION_TIMER=true`, `RETENTION_MONTHS=12` configured.
 - Existing lifecycle rule `submissions-retention-365-days` was disabled; fixed
   365-day age is not an exact twelve-calendar-month retention policy.
@@ -67,9 +72,9 @@ tests. No second real non-Owner/no-MFA identity was used.
 ### Local and Cloud Shell tests
 
 The earlier 55-test package passed locally and in ephemeral Cloud Shell. The
-current 60-test backend suite passed locally and in full CI #142 for the tested
-Owner/storage code, together with the 25-page smoke suite and UI regression
-checks. These include signed-token negative cases, EN/EL multipart flows,
+Owner/storage 60-test suite passed CI #142. The notification addition passed
+69 backend tests locally and in CI #146 (run 41717179123), together with
+packaging, the 25-page smoke suite and UI regression checks. These include signed-token negative cases, EN/EL multipart flows,
 conflict-safe rollback, expiry, deletion retry and mocked ACS delivery.
 The staged package imports successfully; importing alone is not a Functions
 host test.
@@ -105,8 +110,9 @@ original PR #11 package was redeployed and the diagnostic URL returned 404.
 An anonymous external CV-container listing returned 403 before deployment.
 
 The hourly `purgeExpiredSubmissions` timer was registered after a restart and
-trigger sync. The registered function list contains the two closed forms, owner
-download and retention timer; no diagnostic function remains. An actual scheduled
+trigger sync. The final registered function list contains the closed forms, Owner console/
+download functions and retention timer; no diagnostic function remains. The
+notification timer is registered only while email dispatch is enabled. An actual scheduled
 hourly run has not been observed; the real deletion was exercised by the isolated
 synthetic probe.
 
@@ -122,12 +128,14 @@ yet; the USD 8–9 figure remains an estimate.
    download are verified. Keep exact Owner/client/tenant/audience/scope/MFA
    enforcement. Additional real-user negative identity tests may extend the
    signed-token suite; no new identity licence was purchased.
-2. ACS Email resources and a verified Azure-managed sender have not been created.
-   Obtain any necessary explicit service approval, configure least-privilege
-   email-send access and verify synthetic delivery to `info@outliners.gr`.
-   No public outliners.gr DNS change is needed for an Azure-managed sender.
-3. Implement durable email retry/reconciliation; current email failures preserve
-   submissions but do not provide a durable delivery outbox.
+2. Approved ACS resources and a verified Azure-managed sender now exist.
+   Actual Managed Identity POST/poll succeeded, but both synthetic emails
+   hard-bounced (SMTP 550 / 5.1.1). Recipient mailbox correction is required;
+   email dispatch is paused. No DNS change or new mail service is authorized.
+3. Durable sidecars, global lease, ETags, backoff, bounded retries and a monthly
+   send cap are implemented and tested across restart. Ambiguous operations
+   require manual reconciliation rather than blind resending. ACS completion
+   is not recipient-delivery confirmation. See EMAIL_NOTIFICATIONS.md.
 4. Verify scheduled retention execution and operational alerting/recovery. Purge
    deletes metadata last for retry; corrupt metadata requires investigation.
    Twelve UTC calendar months is the logical deletion deadline; seven-day soft

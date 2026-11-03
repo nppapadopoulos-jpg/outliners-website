@@ -92,7 +92,8 @@ the storage network policy; that policy was not relaxed.
 
 The twelve-calendar-month retention function and seven-day soft-delete recovery
 policy remain part of the existing architecture. A naturally scheduled hourly
-execution still needs separate observation. Email delivery/ACS, durable email
-retry, distributed abuse controls, orphan reconciliation and final production
-review remain gates. No public DNS change, form activation, paid resource/licence
+execution still needs separate observation. ACS and durable retry were subsequently implemented; the actual recipient
+mailbox hard-bounced the two synthetic notifications, so email remains paused.
+See [email verification](EMAIL_NOTIFICATIONS.md). Distributed abuse controls,
+orphan reconciliation and final production review remain gates. No public DNS change, form activation, unapproved resource/licence
 creation or merge was performed.
