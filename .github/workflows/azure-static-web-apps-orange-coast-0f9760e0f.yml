@@ -1,6 +1,8 @@
-name: OUTLINERS tenant static preview (Free)
+name: OUTLINERS tenant closed-forms website (Free)
 
-# Only this new OUTLINERS resource is deployed; merges alone do not publish.
+# Only the new OUTLINERS resource is deployed; DNS and live forms stay unchanged.
+# Production SEO/sitemap are ready; indexing.js keeps temporary Azure mirrors noindex.
+# Merges alone do not publish.
 on:
   push:
     branches: [codex/azure-private-backend]
@@ -16,7 +18,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Validate and publish closed-forms preview to OUTLINERS Free SWA
+    name: Validate and publish closed-forms release candidate to OUTLINERS Free SWA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,11 +28,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate site and assemble public-only staging package
+      - name: Validate site and assemble public-only release candidate
         run: |
           python3 tests/smoke_test.py
           python3 tests/seo_audit.py
-          node tools/build-static.mjs staging "$GITHUB_WORKSPACE/staging"
+          node tools/build-static.mjs production "$GITHUB_WORKSPACE/staging"
           test ! -e staging/api
           test ! -e staging/docs
           python3 - <<'PYTHON'
