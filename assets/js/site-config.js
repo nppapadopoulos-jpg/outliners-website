@@ -1,3 +1,3 @@
-/* Public configuration. Set a real GA4 stream ID only after account setup/review.
- * Empty is intentional: never invent an ID or send data to a test property. */
-window.OUTLINERS_SITE_CONFIG = Object.freeze({ ga4MeasurementId: "" });
+/* Public GA4 configuration. Analytics is loaded only after visitor consent.
+ * Production receipt and consent behavior must be verified at go-live. */
+window.OUTLINERS_SITE_CONFIG = Object.freeze({ ga4MeasurementId: "G-RSEFT347TW" });
