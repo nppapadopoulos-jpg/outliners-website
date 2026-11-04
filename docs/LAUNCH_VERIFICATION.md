@@ -20,13 +20,18 @@ This is a source/readiness report, not a production deployment report.
 - Consent integration intercepts all external requests: Google loader and Azure
   responses are synthetic. It verifies no pre-consent requests/cookies, reject
   without blocking intake, footer settings, revocation/cookie removal, safe event
-  payloads, no retroactive/duplicate/preview/failed conversions, and both success
+  payloads, provider campaign fallback overrides and query/hash clearing before tag load, no retroactive/duplicate/preview/failed conversions, and both success
   event names in EL/EN. It does not claim real GA4 account receipt.
 - Initial Lighthouse default mobile runs varied substantially on shared CI:
   EN performance 90 then 64; EL 100; SEO/accessibility/best-practices 100. Raw
   reports show main-thread variability. The final workflow records three runs
   per language and their median, preserving every report for inspection. Do not
   cherry-pick one score or label lab results as field Core Web Vitals.
+- CI #162 (41742594814), three default mobile runs per language: EN performance
+  86/92/92, median 92, median LCP 3.38 s, CLS 0, TBT 0 ms; EL 100/100/100,
+  median LCP 1.20 s, CLS 0, TBT 0 ms. SEO/accessibility/best-practices were 100.
+  EN lab LCP remains above the 2.5 s good-field reference; production field data
+  and post-launch measurement remain necessary. This is not a ranking guarantee.
 
 ## Actual live Azure checks in this preparation
 

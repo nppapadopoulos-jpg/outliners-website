@@ -16,7 +16,8 @@
   function safePage(){return 'https://outliners.gr'+location.pathname;}
   function referrer(){try{var u=new URL(document.referrer);return ['outliners.gr','www.outliners.gr','www.google.com','www.google.gr','google.com','www.bing.com','bing.com','www.linkedin.com','linkedin.com'].includes(u.hostname)?u.origin+'/':'';}catch{return '';}}
   function attribution(){
-    var params=new URLSearchParams(location.search), source=params.get('utm_source'),medium=params.get('utm_medium'), result={};
+    var params=new URLSearchParams(location.search), source=params.get('utm_source'),medium=params.get('utm_medium'), result={campaign_id:'not-set',campaign_name:'not-set',campaign_term:'not-set',campaign_content:'not-set',campaign_source:'(direct)',campaign_medium:'(none)'};
+    try { var ref=new URL(document.referrer);if(!['outliners.gr','www.outliners.gr'].includes(ref.hostname)){result.campaign_source='other-referral';result.campaign_medium='referral';if(['www.google.com','www.google.gr','google.com'].includes(ref.hostname)){result.campaign_source='google';result.campaign_medium='organic';}if(['www.bing.com','bing.com'].includes(ref.hostname)){result.campaign_source='bing';result.campaign_medium='organic';}if(['www.linkedin.com','linkedin.com'].includes(ref.hostname)){result.campaign_source='linkedin';result.campaign_medium='social';}} } catch {}
     if(['google','bing','linkedin','newsletter','outliners'].includes(source))result.campaign_source=source;
     if(['organic','social','email','referral','cpc'].includes(medium))result.campaign_medium=medium;
     // All other free-text campaign fields, IDs and query strings are discarded.
@@ -27,11 +28,15 @@
     if(!canMeasure())return;
     window['ga-disable-'+id]=false;
     if(!loaded){
+      // Prevent the provider's automatic UTM/click-ID fallback from reading arbitrary
+      // public URL text. Capture only our allowlisted attribution, then clear query/hash.
+      var campaign=attribution();
+      if(location.search||location.hash){try{history.replaceState(history.state,'',location.pathname);}catch{return;}}
       loaded=true;window.dataLayer=[];
       gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
       gtag('consent','update',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
       gtag('js',new Date());
-      gtag('config',id,Object.assign({send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:safePage(),page_referrer:referrer(),page_title:document.title,cookie_domain:'outliners.gr',cookie_expires:DAYS*86400,cookie_update:false,cookie_flags:'SameSite=Lax;Secure'},attribution()));
+      gtag('config',id,Object.assign({send_page_view:false,allow_google_signals:false,allow_ad_personalization_signals:false,page_location:safePage(),page_referrer:referrer(),page_title:document.title,cookie_domain:'outliners.gr',cookie_expires:DAYS*86400,cookie_update:false,cookie_flags:'SameSite=Lax;Secure'},campaign));
       configured=true;
       var script=document.createElement('script');script.async=true;script.id='outliners-ga4';script.src='https://www.googletagmanager.com/gtag/js?id='+id;document.head.appendChild(script);
     }

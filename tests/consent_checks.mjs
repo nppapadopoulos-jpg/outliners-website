@@ -38,8 +38,9 @@ assert.equal(f.google(),0);assert.equal((await f.context.cookies()).some(x=>x.na
 await f.page.locator('#cookie-consent').getByRole('button',{name:'Reject non-essential',exact:true}).click();
 await submit(f.page);assert.equal(f.posts(),1);assert.equal(f.google(),0,'rejection must not block intake');
 await f.page.locator('[data-cookie-settings]').click();await f.page.getByRole('dialog').getByRole('button',{name:'Accept all',exact:true}).click();
-await f.page.waitForFunction(()=>document.cookie.includes('_ga='));assert.equal(f.google(),1);let queue=await f.page.evaluate(()=>window.dataLayer.map(x=>Array.from(x)));
+await f.page.waitForFunction(()=>document.cookie.includes('_ga='));assert.equal(f.google(),1);assert.equal(new URL(f.page.url()).search,'');assert.equal(new URL(f.page.url()).hash,'');let queue=await f.page.evaluate(()=>window.dataLayer.map(x=>Array.from(x)));
 assert.equal(queue.filter(x=>x[0]==='event'&&x[1]==='submit_cv_success').length,0,'no retroactive conversion after consent');
+const gaConfig=queue.find(x=>x[0]==='config')[2];assert.equal(gaConfig.campaign_name,'not-set');assert.equal(gaConfig.campaign_source,'linkedin');assert.equal(gaConfig.campaign_medium,'social');
 await submit(f.page);queue=await f.page.evaluate(()=>window.dataLayer.map(x=>Array.from(x)));
 assert.equal(queue.filter(x=>x[0]==='event'&&x[1]==='submit_cv_success').length,1);
 assert.ok(!JSON.stringify(queue).includes('example.invalid'));assert.ok(!JSON.stringify(queue).includes('11111111-1111'));assert.ok(!JSON.stringify(queue).includes('Synthetic Consent Person'));assert.ok(!JSON.stringify(queue).includes('#secret'));
