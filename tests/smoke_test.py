@@ -12,7 +12,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE = "https://outliners.gr"
+SITE = "https://www.outliners.gr"
 errors = []
 
 

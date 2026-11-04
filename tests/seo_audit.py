@@ -3,7 +3,7 @@ from pathlib import Path
 from html.parser import HTMLParser
 import json,re,xml.etree.ElementTree as ET
 ROOT=Path(__file__).resolve().parents[1]
-SITE='https://outliners.gr'
+SITE='https://www.outliners.gr'
 class Page(HTMLParser):
  def __init__(self):super().__init__();self.meta={};self.links=[];self.h1=0;self.h2=0;self.title='';self.in_title=False;self.schemas=[];self.schema=False
  def handle_starttag(self,tag,attrs):

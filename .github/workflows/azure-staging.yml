@@ -2,6 +2,9 @@ name: Azure static release (Free, manual approval)
 
 # Both staging and production writes are explicit. Merging alone must not publish.
 on:
+  push:
+    branches: [codex/azure-private-backend]
+    paths: [.github/workflows/azure-staging.yml]
   workflow_dispatch:
     inputs:
       mode:
@@ -21,6 +24,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: outliners-owned-static-release
@@ -28,15 +32,32 @@ concurrency:
 
 jobs:
   deploy:
+    if: >-
+      github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'release: approved www SEO 2026-11-04 (keep live forms)'
     name: Publish approved static package to OUTLINERS Azure SWA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Require successful CI on this exact revision
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            for (let attempt=0; attempt<120; attempt++) {
+              const r=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'ci.yml',head_sha:context.sha,event:'push'});
+              const run=r.data.workflow_runs[0];
+              if(run?.status==='completed') {
+                if(run.conclusion!=='success') throw new Error('Release stopped: exact-revision CI did not pass');
+                core.info('Exact-revision CI passed');return;
+              }
+              await new Promise(resolve=>setTimeout(resolve,10000));
+            }
+            throw new Error('Release stopped: CI timeout');
       - name: Validate explicit release inputs
         env:
-          RELEASE_MODE: ${{ inputs.mode }}
-          RELEASE_APPROVAL: ${{ inputs.approval }}
-          RELEASE_FORMS: ${{ inputs.enable_forms }}
+          RELEASE_MODE: ${{ github.event_name == 'push' && 'production' || inputs.mode }}
+          RELEASE_APPROVAL: ${{ github.event_name == 'push' && 'OUTLINERS_GO_LIVE' || inputs.approval }}
+          RELEASE_FORMS: ${{ github.event_name == 'push' && 'true' || inputs.enable_forms }}
         run: |
           set -euo pipefail
           case "$RELEASE_MODE" in staging|production) ;; *) exit 1 ;; esac
@@ -48,8 +69,8 @@ jobs:
           fi
       - name: Assemble public-only approved site
         env:
-          RELEASE_MODE: ${{ inputs.mode }}
-          RELEASE_FORMS: ${{ inputs.enable_forms }}
+          RELEASE_MODE: ${{ github.event_name == 'push' && 'production' || inputs.mode }}
+          RELEASE_FORMS: ${{ github.event_name == 'push' && 'true' || inputs.enable_forms }}
         run: |
           node tools/build-static.mjs "$RELEASE_MODE" "$GITHUB_WORKSPACE/staging"
           if [ "$RELEASE_FORMS" = true ]; then
@@ -65,6 +86,19 @@ jobs:
           fi
           test ! -e staging/api
           test ! -e staging/docs
+      - name: Ensure approved SEO release preserves the live forms
+        if: github.event_name == 'push'
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import urllib.request
+          for rel in ['submit-cv/index.html','el/submit-cv/index.html','request-talent/index.html','el/request-talent/index.html']:
+              built=(Path('staging')/rel).read_text()
+              assert 'data-preview="false"' in built and 'preview-badge' not in built
+              live=urllib.request.urlopen('https://www.outliners.gr/'+rel.replace('index.html',''),timeout=30).read().decode()
+              assert live.replace('https://outliners.gr','https://www.outliners.gr')==built, 'Release stopped: form content or behavior differs beyond preferred domain'
+          assert '<html lang="en"' in Path('staging/index.html').read_text()
+          PYCODE
       - name: Deploy to OUTLINERS Azure Static Web App (Free)
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -75,3 +109,4 @@ jobs:
           api_location: ""
           output_location: ""
           skip_app_build: true
+          production_branch: codex/azure-private-backend
