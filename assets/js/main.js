@@ -1,4 +1,4 @@
-/* OutLiners — site behaviour (no dependencies, no trackers, nothing stored) */
+/* OutLiners — site navigation and presentation (consent/optional analytics are separate) */
 (function () {
   "use strict";
 

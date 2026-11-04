@@ -15,7 +15,11 @@ jobs:
         with:
           python-version: "3.12"
       - name: Run smoke tests
-        run: python3 tests/smoke_test.py
+        run: |
+          python3 tests/smoke_test.py
+          python3 tests/seo_audit.py
+          node tools/build-static.mjs staging "$RUNNER_TEMP/static-staging"
+          node tools/build-static.mjs production "$RUNNER_TEMP/static-production"
 
   backend-tests:
     name: Forms backend tests (mocked storage/email)
@@ -26,7 +30,15 @@ jobs:
         with:
           node-version: "22"
       - name: Run backend test suite
-        run: node --test api/tests/*.test.mjs
+        run: |
+          npm ci --prefix api --ignore-scripts --no-audit --no-fund
+          node --test api/tests/*.test.mjs
+      - name: Verify complete Azure deployment package
+        run: |
+          node api/tools/package-azure.mjs "$RUNNER_TEMP/outliners-api"
+          cd "$RUNNER_TEMP/outliners-api"
+          npm ci --ignore-scripts --no-audit --no-fund
+          node -e "import('./azure/src/index.js')"
 
   ui-regression:
     name: UI regression (axe accessibility, nav wrap, overflow)
@@ -44,3 +56,18 @@ jobs:
         run: python3 -m http.server 8900 &
       - name: Run UI checks
         run: node tests/ui_checks.mjs
+      - name: Consent and conversion integration (synthetic, no provider sends)
+        run: node tests/consent_checks.mjs
+      - name: Lighthouse mobile lab audit
+        run: |
+          CHROME_PATH=$(node -e "console.log(require('playwright').chromium.executablePath())")
+          for SAMPLE in 1 2 3; do
+            npx --yes lighthouse@13.6.0 http://localhost:8900/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-en-$SAMPLE.json" --only-categories=performance,accessibility,best-practices,seo --quiet
+            npx --yes lighthouse@13.6.0 http://localhost:8900/el/ --chrome-path="$CHROME_PATH" --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --output=json --output-path="$RUNNER_TEMP/lighthouse-el-$SAMPLE.json" --only-categories=performance,accessibility,best-practices,seo --quiet
+          done
+          node tests/lighthouse_summary.mjs "$RUNNER_TEMP"/lighthouse-*.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-lab-results
+          path: ${{ runner.temp }}/lighthouse-*.json
+          retention-days: 7

@@ -12,7 +12,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE = "https://outliners.gr"
+SITE = "https://www.outliners.gr"
 errors = []
 
 
@@ -32,13 +32,19 @@ def resolve(href):
 
 
 def main():
-    pages = sorted(glob.glob(os.path.join(ROOT, "**", "*.html"), recursive=True))
+    pages = sorted(p for p in glob.glob(os.path.join(ROOT, "**", "*.html"), recursive=True)
+                   if "node_modules" not in os.path.relpath(p, ROOT).split(os.sep)
+                   and os.path.relpath(p, ROOT).split(os.sep)[0] != "api")
     if len(pages) < 10:
         err(f"expected at least 10 pages, found {len(pages)}")
 
     for page in pages:
         rel = os.path.relpath(page, ROOT)
         html = open(page, encoding="utf-8").read()
+        if re.fullmatch(r'google[a-z0-9]+\.html', rel):
+            if open(page, encoding='utf-8').read().strip() != 'google-site-verification: '+rel:
+                err(f'{rel}: invalid Google verification file')
+            continue
         is_greek = rel.startswith("el/") or rel.startswith("el" + os.sep)
         is_404 = rel == "404.html"
 

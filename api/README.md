@@ -1,5 +1,11 @@
 # OutLiners forms backend
 
+Current implementation and verified cloud status: [Azure backend status](../docs/AZURE_BACKEND_STATUS.md).
+The historical description below predates the private storage provisioning.
+Use `npm ci --prefix api` before `node --test api/tests/*.test.mjs`.
+Stage the complete backend with `node api/tools/package-azure.mjs /absolute/new/directory`;
+do not deploy `api/azure` alone. No deployment command runs automatically.
+
 Implements `docs/FORMS_BACKEND_CONTRACT.md` for the two intake workflows
 (`/api/request-talent`, `/api/submit-cv`) as a **hosting-independent core**:
 the handler takes a Web-standard `Request` and returns a `Response`, with all

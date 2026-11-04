@@ -5,17 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ζητήστε Ταλέντο — OutLiners</title>
 <meta name="description" content="Πείτε στην OutLiners για τη θέση που θέλετε να καλύψετε: executive search, εξειδικευμένη στελέχωση και embedded υποστήριξη προσλήψεων στην Ελλάδα και διεθνώς.">
-<link rel="canonical" href="https://outliners.gr/el/request-talent/">
-<link rel="alternate" hreflang="en" href="https://outliners.gr/request-talent/">
-<link rel="alternate" hreflang="el" href="https://outliners.gr/el/request-talent/">
-<link rel="alternate" hreflang="x-default" href="https://outliners.gr/request-talent/">
+<link rel="canonical" href="https://www.outliners.gr/el/request-talent/">
+<link rel="alternate" hreflang="en" href="https://www.outliners.gr/request-talent/">
+<link rel="alternate" hreflang="el" href="https://www.outliners.gr/el/request-talent/">
+<link rel="alternate" hreflang="x-default" href="https://www.outliners.gr/request-talent/">
 <meta name="theme-color" content="#0b0b0c">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="OutLiners">
 <meta property="og:title" content="Ζητήστε Ταλέντο — OutLiners">
 <meta property="og:description" content="Πείτε στην OutLiners για τη θέση που θέλετε να καλύψετε: executive search, εξειδικευμένη στελέχωση και embedded υποστήριξη προσλήψεων στην Ελλάδα και διεθνώς.">
-<meta property="og:url" content="https://outliners.gr/el/request-talent/">
-<meta property="og:image" content="https://outliners.gr/assets/img/og-image.png">
+<meta property="og:url" content="https://www.outliners.gr/el/request-talent/">
+<meta property="og:image" content="https://www.outliners.gr/assets/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="el_GR">
@@ -25,6 +25,10 @@
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/styles.css">
+<link rel="stylesheet" href="/assets/css/consent.css">
+<script src="/assets/js/indexing.js" defer></script>
+<script src="/assets/js/site-config.js" defer></script>
+<script src="/assets/js/consent.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Μετάβαση στο περιεχόμενο</a>
@@ -55,7 +59,7 @@
 
 <section class="section intake-section" aria-labelledby="form-h">
   <div class="wrap">
-    <p class="preview-badge" role="note">Προεπισκόπηση — οι υποβολές δεν είναι ακόμη ενεργές. Η φόρμα θα ενεργοποιηθεί μόλις συνδεθεί η ασφαλής υποδομή.</p>
+    <p class="preview-badge" role="note">Προεπισκόπηση — οι υποβολές θα ανοίξουν μετά την τελική έγκριση.</p>
     <h2 class="visually-hidden" id="form-h">Φόρμα αιτήματος στελέχωσης</h2>
     <form class="intake-form" action="/api/request-talent" method="post" enctype="multipart/form-data" novalidate data-preview="true">
       <div class="hp-field" aria-hidden="true">
@@ -120,12 +124,12 @@
         <input id="rt-file" name="attachment" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
         <p class="field-error" id="rt-file-error" hidden></p>
       </div>
-      <div class="field field--full consent" data-error="Παρακαλούμε επιβεβαιώστε ότι συμφωνείτε με την επεξεργασία των στοιχείων σας.">
+      <div class="field field--full consent" data-error="Παρακαλούμε επιβεβαίωσε ότι διάβασες την Πολιτική Απορρήτου.">
         <input id="rt-consent" name="consent" type="checkbox" value="yes" required aria-required="true">
-        <label for="rt-consent">Συμφωνώ με την επεξεργασία των στοιχείων αυτής της φόρμας από την OutLiners για την απάντηση στο αίτημά μου, όπως περιγράφεται στην <a href="/el/privacy-policy/">Πολιτική Απορρήτου</a>.</label>
+        <label for="rt-consent">Έχω διαβάσει την <a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> σχετικά με τη διαχείριση του αιτήματός μου.</label>
         <p class="field-error" id="rt-consent-error" hidden></p>
       </div>
-      <p class="legal-note">Η διατύπωση της συγκατάθεσης είναι προσχέδιο και εκκρεμεί νομικός έλεγχος πριν από τη δημοσίευση.</p>
+      <p class="legal-note">Χρησιμοποιούμε τα στοιχεία για να απαντήσουμε στο επαγγελματικό σου αίτημα.</p>
       </div>
       <div class="actions">
         <button class="btn" type="submit">Αποστολή αιτήματος <span class="arrow" aria-hidden="true">→</span></button>
@@ -180,7 +184,7 @@
     </div>
     <div class="footer-bottom">
       <span>© <span data-year>2025</span> OutLiners. Με επιφύλαξη παντός δικαιώματος.</span>
-      <span><a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> &nbsp;·&nbsp; <a href="/el/cookies/">Cookies</a></span>
+      <span><a href="/el/privacy-policy/">Πολιτική Απορρήτου</a> &nbsp;·&nbsp; <a href="/el/cookies/">Cookies</a> &nbsp;·&nbsp; <button type="button" data-cookie-settings>Ρυθμίσεις cookies</button></span>
     </div>
   </div>
 </footer>

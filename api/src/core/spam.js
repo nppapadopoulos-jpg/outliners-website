@@ -36,6 +36,10 @@ export function createRateLimiter({ rateLimitPerHour }) {
 export function createDuplicateGuard({ duplicateWindowMs }) {
   const seen = new Map(); // form|email(lowercased) -> { at, id }
   return {
+    forget(form, email, id) {
+      const key = form + '|' + String(email).toLowerCase();
+      if (seen.get(key)?.id === id) seen.delete(key);
+    },
     check(form, email, id, now = Date.now()) {
       const key = form + "|" + String(email).toLowerCase();
       const prev = seen.get(key);

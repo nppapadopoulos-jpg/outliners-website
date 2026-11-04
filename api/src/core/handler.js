@@ -60,7 +60,12 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
 
     let formData;
     try {
-      formData = await request.formData();
+      if (request.body?.getReader) {
+        const reader=request.body.getReader(),chunks=[];let count=0;
+        while(true){const {done,value}=await reader.read();if(done)break;count+=value.byteLength;if(count>config.maxRequestBytes){await reader.cancel();return json(413,{ok:false,errors:{file:'too-large'}});}chunks.push(value);}
+        const bytes=Buffer.concat(chunks.map(v=>Buffer.from(v)));
+        formData=await new Request('https://intake.internal/',{method:'POST',headers:{'content-type':contentType},body:bytes}).formData();
+      } else formData = await request.formData();
     } catch {
       logger.warn({ ...base, event: "rejected", code: "malformed-multipart" });
       return json(400, { ok: false, errors: { request: "malformed" } });
@@ -116,29 +121,43 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
       return json(200, { ok: true, id: dupOf, duplicate: true });
     }
 
+    const receivedAt = Date.now();
+    const pool = formName === "submit-cv" && fields.talent_pool_consent === "yes";
+    const maxDeadline = config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths, receivedAt) : deleteAfter(config.retentionDays, receivedAt);
+    const specificDeadline = formName === "submit-cv" && !pool ? deleteAfterMonths(3, receivedAt) : null;
+    const deadline = maxDeadline && specificDeadline ? (maxDeadline < specificDeadline ? maxDeadline : specificDeadline) : maxDeadline;
     const record = {
       id,
       form: formName,
-      receivedAt: new Date().toISOString(),
-      deleteAfter: config.retentionMonths != null ? deleteAfterMonths(config.retentionMonths) : deleteAfter(config.retentionDays),
-      consent: { value: "yes", recordedAt: new Date().toISOString() },
+      receivedAt: new Date(receivedAt).toISOString(),
+      deleteAfter: deadline,
+      // Legacy field name retained for compatibility; this event is notice acknowledgement, not blanket consent.
+      consent: { value: "yes", purpose: "privacy-notice-acknowledgement", noticeVersion: "2026-11-04", recordedAt: new Date(receivedAt).toISOString() },
+      processing: { specificOpportunity: !!fields.position_reference, futureOpportunities: pool, specificBasis: formName === "submit-cv" && fields.position_reference ? "6(1)(f)" : null, futureBasis: pool ? "6(1)(a)" : null },
+      talentPoolConsent: formName === "submit-cv" ? { value: pool ? "yes" : "no", noticeVersion: "2026-11-04", recordedAt: new Date(receivedAt).toISOString() } : null,
       fields: Object.fromEntries(Object.entries(fields).filter(([k]) => k !== "consent")),
       file: file ? { name: file.storedName, type: file.type, bytes: file.bytes } : null,
     };
 
     let storagePath;
+    let acceptedId=id;
     try {
-      storagePath = await storage.store({ id, form: formName, record, file });
+      const stored = await storage.store({ id, form: formName, record, file, admission: { ipHash: hashedIp } });
+      storagePath = typeof stored==='string' ? stored : stored.path;
+      acceptedId = typeof stored==='object' ? stored.id : id;
+      if (stored?.duplicate) return json(200,{ok:true,id:acceptedId,duplicate:true});
     } catch (err) {
+      duplicates.forget(formName, fields.email, id);
       logger.error({ ...base, event: "storage-failed", id, reason: err?.code || "error" });
-      return json(502, { ok: false, retry: true });
+      return json(err?.statusCode===429 ? 429 : 502, { ok: false, retry: true });
     }
 
     // Notification failure never loses the submission: the record is already
     // in private storage; the failure is logged for manual follow-up.
     let notified = true;
     try {
-      await email.send(buildNotification({ form: formName, id, fields, file, storagePath, config }));
+      const result = await email.send(buildNotification({ form: formName, id: acceptedId, fields, file, storagePath, config }));
+      notified = result?.delivered !== false;
     } catch (err) {
       notified = false;
       logger.error({ ...base, event: "notify-failed", id, reason: err?.code || "error" });
@@ -148,6 +167,6 @@ export function createFormsHandler({ config, storage, email, logger = createLogg
       ...base, event: "accepted", id, lang: fields.lang, outcome: notified ? "stored+notified" : "stored",
       fileType: file?.type, fileBytes: file?.bytes, durationMs: Date.now() - started,
     });
-    return json(200, { ok: true, id });
+    return json(200, { ok: true, id: acceptedId });
   };
 }

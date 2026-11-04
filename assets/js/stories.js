@@ -9,6 +9,7 @@
   const play = hero.querySelector('.story-play');
   const greek = document.documentElement.lang === 'el';
   const paths = ['innovation.webp','vision.webp','responsibility.webp','determination.webp'];
+  const alts = greek ? ['Προγραμματιστής σε σύγχρονο χώρο εργασίας τεχνολογίας','Αρχιτέκτονας σχεδιάζει το επόμενο έργο','Χειρουργός στον χώρο εργασίας της','Αθλητής αγώνων με αγωνιστικό αμαξίδιο'] : ['Developer collaborating in a technology workplace','Architect planning her next project','Surgeon in her professional workplace','Athlete competing in a racing wheelchair'];
   const loaded = new Map();
   const caption = hero.querySelector('.story-caption');
   const captionTitle = hero.querySelector('.story-caption__title');
@@ -36,6 +37,7 @@
       const asset = new Image();
       asset.onload = () => resolve(asset);
       asset.onerror = () => resolve(null);
+      asset.fetchPriority = 'low';
       asset.src = '/assets/img/stories/' + paths[index];
     });
     loaded.set(index, promise);
@@ -69,6 +71,9 @@
       back.width = asset.naturalWidth;
       back.height = asset.naturalHeight;
       back.src = asset.src;
+      back.alt = alts[index];
+      back.removeAttribute('aria-hidden');
+      front.setAttribute('aria-hidden','true');
       const outgoing = front, incoming = back;
       requestAnimationFrame(() => {
         incoming.classList.add('is-active');
@@ -109,5 +114,10 @@
   // First story is the AI developer. Use the approved meeting-room fallback until images are uploaded.
   select(0, false);
   schedule();
-  paths.forEach((_, index) => { if (index) preload(index); });
+  // Let the initial hero/font finish before prefetching the next story.
+  window.addEventListener('load', () => {
+    const next = () => preload((current + 1) % paths.length);
+    if ('requestIdleCallback' in window) window.requestIdleCallback(next, {timeout:4000});
+    else setTimeout(next,2000);
+  }, {once:true});
 })();

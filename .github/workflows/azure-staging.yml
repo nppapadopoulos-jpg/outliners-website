@@ -1,64 +1,112 @@
-name: Azure staging (Free Static Web App)
+name: Azure static release (Free, manual approval)
 
+# Both staging and production writes are explicit. Merging alone must not publish.
 on:
   push:
-    branches:
-      - feature/story-captions-email
-    paths:
-      - ".github/workflows/azure-staging.yml"
-      - "index.html"
-      - "404.html"
-      - "favicon.png"
-      - "assets/**"
-      - "about/**"
-      - "contact/**"
-      - "cookies/**"
-      - "el/**"
-      - "industries/**"
-      - "privacy-policy/**"
-      - "request-talent/**"
-      - "services/**"
-      - "submit-cv/**"
+    branches: [codex/azure-private-backend]
+    paths: [.github/workflows/azure-staging.yml]
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Build/deploy staging (noindex) or approved production
+        type: choice
+        options: [staging, production]
+        default: staging
+        required: true
+      approval:
+        description: Production only - type OUTLINERS_GO_LIVE after Owner approval
+        type: string
+        default: ""
+      enable_forms:
+        description: Production only - publish the approved real forms
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
-  group: outliners-azure-staging
-  cancel-in-progress: true
+  group: outliners-owned-static-release
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Publish static preview to Azure
+    if: >-
+      github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'release: approved www SEO 2026-11-04 (keep live forms)'
+    name: Publish approved static package to OUTLINERS Azure SWA
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Assemble public-only staging site
-        shell: bash
+      - name: Require successful CI on this exact revision
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            for (let attempt=0; attempt<120; attempt++) {
+              const r=await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'ci.yml',head_sha:context.sha,event:'push'});
+              const run=r.data.workflow_runs[0];
+              if(run?.status==='completed') {
+                if(run.conclusion!=='success') throw new Error('Release stopped: exact-revision CI did not pass');
+                core.info('Exact-revision CI passed');return;
+              }
+              await new Promise(resolve=>setTimeout(resolve,10000));
+            }
+            throw new Error('Release stopped: CI timeout');
+      - name: Validate explicit release inputs
+        env:
+          RELEASE_MODE: ${{ github.event_name == 'push' && 'production' || inputs.mode }}
+          RELEASE_APPROVAL: ${{ github.event_name == 'push' && 'OUTLINERS_GO_LIVE' || inputs.approval }}
+          RELEASE_FORMS: ${{ github.event_name == 'push' && 'true' || inputs.enable_forms }}
         run: |
           set -euo pipefail
-          mkdir -p staging
-          cp index.html 404.html favicon.png staging/
-          cp -R assets about contact cookies el industries privacy-policy request-talent services submit-cv staging/
-          printf 'User-agent: *\nDisallow: /\n' > staging/robots.txt
-          cat > staging/staticwebapp.config.json <<'JSON'
-          {
-            "globalHeaders": {
-              "X-Robots-Tag": "noindex, nofollow, noarchive"
-            }
-          }
-          JSON
-          test -f staging/el/index.html
+          case "$RELEASE_MODE" in staging|production) ;; *) exit 1 ;; esac
+          if [ "$RELEASE_MODE" = production ]; then
+            test "$RELEASE_APPROVAL" = OUTLINERS_GO_LIVE
+            node -e "const fs=require('fs'),vm=require('vm');const c={window:{}};vm.runInNewContext(fs.readFileSync('assets/js/site-config.js','utf8'),c);if(!/^G-[A-Z0-9]{6,15}$/.test(c.window.OUTLINERS_SITE_CONFIG.ga4MeasurementId))throw Error('Real approved GA4 stream ID is required before production');"
+          else
+            test "$RELEASE_FORMS" != true
+          fi
+      - name: Assemble public-only approved site
+        env:
+          RELEASE_MODE: ${{ github.event_name == 'push' && 'production' || inputs.mode }}
+          RELEASE_FORMS: ${{ github.event_name == 'push' && 'true' || inputs.enable_forms }}
+        run: |
+          node tools/build-static.mjs "$RELEASE_MODE" "$GITHUB_WORKSPACE/staging"
+          if [ "$RELEASE_FORMS" = true ]; then
+            python3 - <<'PY'
+          from pathlib import Path
+          for rel in ['submit-cv/index.html','el/submit-cv/index.html','request-talent/index.html','el/request-talent/index.html']:
+              p=Path('staging')/rel
+              text=p.read_text().replace('data-preview="true"','data-preview="false"')
+              import re
+              text=re.sub(r'<p class="preview-badge"[^>]*>.*?</p>','',text)
+              p.write_text(text)
+          PY
+          fi
           test ! -e staging/api
           test ! -e staging/docs
-      - name: Deploy to Azure Static Web Apps (Free)
+      - name: Ensure approved SEO release preserves the live forms
+        if: github.event_name == 'push'
+        run: |
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import urllib.request
+          for rel in ['submit-cv/index.html','el/submit-cv/index.html','request-talent/index.html','el/request-talent/index.html']:
+              built=(Path('staging')/rel).read_text()
+              assert 'data-preview="false"' in built and 'preview-badge' not in built
+              live=urllib.request.urlopen('https://www.outliners.gr/'+rel.replace('index.html',''),timeout=30).read().decode()
+              assert live.replace('https://outliners.gr','https://www.outliners.gr')==built, 'Release stopped: form content or behavior differs beyond preferred domain'
+          assert '<html lang="en"' in Path('staging/index.html').read_text()
+          PYCODE
+      - name: Deploy to OUTLINERS Azure Static Web App (Free)
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ORANGE_COAST_0F9760E0F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
           app_location: staging
           api_location: ""
           output_location: ""
           skip_app_build: true
+          production_branch: codex/azure-private-backend

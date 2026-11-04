@@ -1,4 +1,8 @@
-# Azure Function App skeleton (NOT deployed, NOT tested against live Azure)
+# Azure Functions backend — staging deployed, public intake disabled
+
+See [current status and deployment gates](../../docs/AZURE_BACKEND_STATUS.md).
+Deploy the complete staged `api` package, including shared source and the root
+package lock. This directory alone is not a deployable unit.
 
 This directory is the deployment unit for the preferred hosting option
 (Azure Static Web Apps with a linked Functions backend). It wires the same

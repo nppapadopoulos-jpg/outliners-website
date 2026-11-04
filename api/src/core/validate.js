@@ -35,6 +35,7 @@ export function validateFields(formName, formData) {
     }
     fields[name] = v;
   }
+  if (formName === "submit-cv" && !fields.position_reference && fields.talent_pool_consent !== "yes") errors.position_reference = "purpose-required";
   return { fields, errors };
 }
 
